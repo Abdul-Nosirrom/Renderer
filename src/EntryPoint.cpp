@@ -17,6 +17,8 @@ int main(int argc, char* argv[]) // SUBSYSTEM:CONSOLE, using default main() sign
 	try
 	{
 		Window newWind(800, 600, "Renderer");
+		float ClearColor[4] = { 0.5, 0, 0, 1 };
+		newWind.GFX().SetClearColor(ClearColor);
 		while (true)
 		{
 			// Process all messages pending
@@ -25,6 +27,10 @@ int main(int argc, char* argv[]) // SUBSYSTEM:CONSOLE, using default main() sign
 				// if return optional has a value, that means its an exit code
 				return *ecode;
 			}
+
+			newWind.GFX().StartFrame(); // Clears render target
+			newWind.GFX().Draw(); // Sets all buffers/pipeline state then calls draw
+			newWind.GFX().EndFrame(); // Presents the backbuffer
 		}
 	}
 	catch (const RomanceException& e)

@@ -147,6 +147,9 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Errors\DXGIInfoManager.cpp" />
+    <ClCompile Include="src\Errors\DXGIMessageMap.cpp" />
+    <ClCompile Include="src\Graphics\Graphics.cpp" />
     <ClCompile Include="src\EntryPoint.cpp" />
     <ClCompile Include="src\IO\Keyboard.cpp" />
     <ClCompile Include="src\IO\Mouse.cpp" />
@@ -154,6 +157,10 @@
     <ClCompile Include="src\Errors\WindowsMessageMap.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Errors\DXGIInfoManager.h" />
+    <ClInclude Include="src\Errors\DXGIMessageMap.h" />
+    <ClInclude Include="src\Errors\GraphicsExceptions.h" />
+    <ClInclude Include="src\Graphics\Graphics.h" />
     <ClInclude Include="src\Errors\RomanceException.h" />
     <ClInclude Include="src\Errors\WindowExceptions.h" />
     <ClInclude Include="src\IO\Keyboard.h" />

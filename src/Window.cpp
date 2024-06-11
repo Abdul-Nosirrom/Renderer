@@ -55,7 +55,7 @@ Window::Window(int width, int height, const char* name)
 	: m_Width(width), m_Height(height)
 {
 	// Window Rect Initial (AdjustWindowRect is another method of stylizing our window, this is based on the 'client region' instead of the whole
-// window region (the area in-between the borders)
+	// window region (the area in-between the borders)
 	RECT wr;
 	wr.left = 100;
 	wr.right = width + wr.left;
@@ -88,6 +88,9 @@ Window::Window(int width, int height, const char* name)
 
 	// Show the window
 	ShowWindow(m_hWnd, SW_SHOWDEFAULT);
+
+	// Initialize DX11
+	pGFX = std::make_unique<Graphics>(m_hWnd);
 }
 
 Window::~Window()

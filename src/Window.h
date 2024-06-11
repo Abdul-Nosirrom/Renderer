@@ -2,7 +2,9 @@
 
 #include "IO/Keyboard.h"
 #include "IO/Mouse.h"
+#include "Graphics/Graphics.h"
 #include <Windows.h>
+#include <memory>
 #include <string>
 #include <optional>
 
@@ -37,6 +39,8 @@ public:
 
 	void SetTitle(const std::string& title);
 
+	Graphics& GFX() const { return *pGFX;  }
+
 	/// @brief  Checks PeekMessage (for all windows, hence static), and handles it, returning a value if found an exit message
 	static std::optional<int> ProcessMessages();
 
@@ -58,6 +62,8 @@ public:
 private:
 	int m_Width, m_Height;
 	HWND m_hWnd;
+
+	std::unique_ptr<Graphics> pGFX;
 
 };
 
