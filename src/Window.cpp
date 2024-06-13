@@ -1,5 +1,6 @@
 #include "Window.h"
 #include <sstream>
+#include "Camera.h"
 #include "Errors/WindowExceptions.h"
 
 /************************************************************************/
@@ -91,6 +92,9 @@ Window::Window(int width, int height, const char* name)
 
 	// Initialize DX11
 	pGFX = std::make_unique<Graphics>(m_hWnd);
+
+	// Initialize camera
+	Camera::Get().SetIO(&kbd, &mouse);
 }
 
 Window::~Window()
@@ -269,6 +273,14 @@ LRESULT WINAPI Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 	case WM_RBUTTONDOWN:
 	{
 		const POINTS pt = MAKEPOINTS(lParam);
+		// Hide cursor and confine it
+		{
+			ShowCursor(FALSE);
+			RECT rect;
+			GetClientRect(hWnd, &rect);
+			MapWindowPoints(hWnd, nullptr, reinterpret_cast<POINT*>(&rect), 2);
+			ClipCursor(&rect);
+		}
 		mouse.OnRightPressed(pt.x, pt.y);
 		break;
 	}
@@ -276,6 +288,11 @@ LRESULT WINAPI Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 	{
 		const POINTS pt = MAKEPOINTS(lParam);
 		mouse.OnRightReleased(pt.x, pt.y);
+		// Show cursor again and remove confinement
+		{
+			ShowCursor(TRUE);
+			ClipCursor(nullptr);
+		}
 		// Release mouse if input released outside of client region
 		if (pt.x < 0 || pt.x >= m_Width || pt.y < 0 || pt.y >= m_Height)
 		{

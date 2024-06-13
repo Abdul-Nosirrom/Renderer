@@ -147,6 +147,8 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="shaders\Shaders.hlsl" />
+    <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Errors\DXGIInfoManager.cpp" />
     <ClCompile Include="src\Errors\DXGIMessageMap.cpp" />
     <ClCompile Include="src\Graphics\Graphics.cpp" />
@@ -157,6 +159,7 @@
     <ClCompile Include="src\Errors\WindowsMessageMap.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Errors\DXGIInfoManager.h" />
     <ClInclude Include="src\Errors\DXGIMessageMap.h" />
     <ClInclude Include="src\Errors\GraphicsExceptions.h" />

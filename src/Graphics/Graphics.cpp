@@ -78,6 +78,49 @@ Graphics::Graphics(HWND hWnd)
 	viewPort.TopLeftX = 0;
 	viewPort.TopLeftY = 0;
 	pContext->RSSetViewports(1u, &viewPort);
+
+	//////////////////////////////////////////////////////////////////////////
+	// Create Depth Stencil State/View & Bind for 3D Rendering Depth Tests
+	//////////////////////////////////////////////////////////////////////////
+
+	// Define the state of the depth stencil obj, we're only enabling depth tests here not stencil tests and setting to to compare by 'less' op
+	// Essentially describing how our depth tests are gonna work
+	D3D11_DEPTH_STENCIL_DESC dssDesc = {};
+	dssDesc.DepthEnable = TRUE;
+	dssDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	dssDesc.DepthFunc = D3D11_COMPARISON_LESS;
+
+	wrl::ComPtr<ID3D11DepthStencilState> pDSState;
+
+	GFX_THROW_INFO(pDevice->CreateDepthStencilState(&dssDesc, &pDSState));
+
+	pContext->OMSetDepthStencilState(pDSState.Get(), 0u); // bind depth state to object merger
+
+	// Create depth texture, this is where depth results will go to
+	wrl::ComPtr<ID3D11Texture2D> pDSTexture;
+	D3D11_TEXTURE2D_DESC dstDesc = {};
+	dstDesc.Width = 800u;
+	dstDesc.Height = 600u;
+	dstDesc.MipLevels = 1u; // disable mips for depth texture
+	dstDesc.ArraySize = 1u; // not an array of textures
+	dstDesc.Format = DXGI_FORMAT_D32_FLOAT; // depth texture with no stencil is just D32
+	dstDesc.SampleDesc.Count = 1u; // no AA
+	dstDesc.SampleDesc.Quality = 0u;
+	dstDesc.Usage = D3D11_USAGE_DEFAULT;
+	dstDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL; // Important to specify this for this texture
+
+	GFX_THROW_INFO(pDevice->CreateTexture2D(&dstDesc, nullptr, &pDSTexture)); // No initial data because it'll be filled for us each frame
+
+	// In order to bind a texture to the pipeline, need to create a 'view' for that texture
+	D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
+	dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
+	dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	dsvDesc.Texture2D.MipSlice = 0u;
+
+	GFX_THROW_INFO(pDevice->CreateDepthStencilView(pDSTexture.Get(), &dsvDesc, &pDSView));
+
+	// Finally bind the depth stencil view to the object merger
+	pContext->OMSetRenderTargets(1u, pRenderTarget.GetAddressOf(), pDSView.Get());
 }
 
 void Graphics::StartFrame() noexcept
@@ -88,6 +131,8 @@ void Graphics::StartFrame() noexcept
 
 	// Clear the back buffer
 	pContext->ClearRenderTargetView(pRenderTarget.Get(), m_ClearColor);
+	// Clear depth buffer
+	pContext->ClearDepthStencilView(pDSView.Get(), D3D11_CLEAR_DEPTH, 1.f, 0u);
 }
 
 void Graphics::EndFrame()
@@ -103,41 +148,55 @@ void Graphics::EndFrame()
 
 #include <d3dcompiler.h>
 #include <chrono>
+#include <DirectXMath.h>
+#include "Camera.h"
 
-void Graphics::Draw()
+void Graphics::Draw(float dT)
 {
 	//////////////////////////////////////////////////////////////////////////
 	// VERTEX & INDEX BUFFER SETUP
 	//////////////////////////////////////////////////////////////////////////
 	struct vertex
 	{
-		float x, y;
-		float r, g, b;
+		float x, y, z;
+		unsigned char r, g, b, a;
 	};
 
-	constexpr vertex tri[3] = {
-		{-0.5, -0.5, 
-			0.5f, 0.f, 0.f},
-		{0, 0.5,
-			0.f, 0.5f, 0.f},
-		{0.5, -0.5,
-			0.f, 0.f, 0.5f}
+	constexpr vertex cubeVerts[8] =
+	{
+		{-1, -1, -1,	255, 0, 0},
+		{1, -1, -1,		0, 255, 0},
+		{-1, 1, -1,		0, 0, 255},
+		{1, 1, -1,		255, 255, 0},
+		{-1, -1, 1,		255, 0, 255},
+		{1, -1, 1,		0, 255, 255},
+		{-1, 1, 1,		0, 0, 0},
+		{1, 1, 1,		255, 255, 255}
 	};
+
 	UINT stride = sizeof(vertex);
 	UINT offset = 0u;
 
-	constexpr UINT idxData[3] = { 2, 1, 0 };
+	constexpr unsigned short idxData[36] =
+	{
+		0,2,1, 2,3,1,
+		1,3,5, 3,7,5,
+		2,6,3, 3,6,7,
+		4,5,7, 4,7,6,
+		0,4,2, 2,4,6,
+		0,1,4, 1,5,4
+	};
 
 	D3D11_BUFFER_DESC vbd;
 	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vbd.Usage = D3D11_USAGE_DEFAULT;
 	vbd.CPUAccessFlags = 0u;
 	vbd.MiscFlags = 0u;
-	vbd.ByteWidth = UINT(sizeof(vertex) * 3);
+	vbd.ByteWidth = sizeof(cubeVerts);
 	vbd.StructureByteStride = sizeof(vertex);
 	
 	D3D11_SUBRESOURCE_DATA data;
-	data.pSysMem = tri;
+	data.pSysMem = cubeVerts;
 
 	wrl::ComPtr<ID3D11Buffer> pBuffer;
 	
@@ -151,8 +210,8 @@ void Graphics::Draw()
 	idb.Usage = D3D11_USAGE_DEFAULT;
 	idb.CPUAccessFlags = 0u;
 	idb.MiscFlags = 0u;
-	idb.ByteWidth = UINT(sizeof(UINT) * 3);
-	idb.StructureByteStride = sizeof(UINT);
+	idb.ByteWidth = sizeof(idxData);
+	idb.StructureByteStride = sizeof(unsigned short);
 
 	D3D11_SUBRESOURCE_DATA idata;
 	idata.pSysMem = idxData;
@@ -199,47 +258,64 @@ void Graphics::Draw()
 	// Compile shaders
 	
 	wrl::ComPtr<ID3DBlob> pVSBytecodeBlob;
-	wrl::ComPtr<ID3DBlob> pGSBytecodeBlob;
 	wrl::ComPtr<ID3DBlob> pPSBytecodeBlob;
 
 	wrl::ComPtr<ID3D11VertexShader> pVertexShader;
-	wrl::ComPtr<ID3D11GeometryShader> pGeoShader;
 	wrl::ComPtr<ID3D11PixelShader> pPixelShader;
 
 
 	CompileShader(L"shaders/Shaders.hlsl", "VSMain", "vs_5_0", &pVSBytecodeBlob);
-	CompileShader(L"shaders/Shaders.hlsl", "GSMain", "gs_5_0", &pGSBytecodeBlob);
 	CompileShader(L"shaders/Shaders.hlsl", "PSMain", "ps_5_0", &pPSBytecodeBlob);
 
 
 	// Create shader from compiled bytecode
 	GFX_THROW_INFO(pDevice->CreateVertexShader(pVSBytecodeBlob->GetBufferPointer(), pVSBytecodeBlob->GetBufferSize(), nullptr, &pVertexShader));
-	GFX_THROW_INFO(pDevice->CreateGeometryShader(pGSBytecodeBlob->GetBufferPointer(), pGSBytecodeBlob->GetBufferSize(), nullptr, &pGeoShader));
 	GFX_THROW_INFO(pDevice->CreatePixelShader(pPSBytecodeBlob->GetBufferPointer(), pPSBytecodeBlob->GetBufferSize(), nullptr, &pPixelShader));
 
 	// Set the shaders
 	pContext->VSSetShader(pVertexShader.Get(), nullptr, 0u);
-	pContext->GSSetShader(pGeoShader.Get(), nullptr, 0u);
 	pContext->PSSetShader(pPixelShader.Get(), nullptr, 0u);
 
 	//////////////////////////////////////////////////////////////////////////
-	// Update Constant buffer
+	// View Projection Matrix Constant Buffer
 	//////////////////////////////////////////////////////////////////////////
-	typedef std::chrono::high_resolution_clock Time;
-	typedef std::chrono::milliseconds ms;
-	typedef std::chrono::duration<float> fsec;
-	static auto t0 = Time::now();
-	auto t1 = Time::now();
-	fsec tInS = t1 - t0;
+
+	struct TransformCBuf
+	{
+		DirectX::XMMATRIX viewProjmat;
+	};
+
+	TransformCBuf transformMat = { Camera::Get().GetViewProjMatrix() };
+
+	wrl::ComPtr<ID3D11Buffer> pTransformCBuf;
+	D3D11_BUFFER_DESC transformCBufDesc = {};
+	transformCBufDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	transformCBufDesc.Usage = D3D11_USAGE_DYNAMIC;
+	transformCBufDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	transformCBufDesc.MiscFlags = 0u;
+	transformCBufDesc.ByteWidth = sizeof(DirectX::XMMATRIX);
+	transformCBufDesc.StructureByteStride = 0u;
+
+	D3D11_SUBRESOURCE_DATA transformData = {};
+	transformData.pSysMem = &transformMat;
+
+	GFX_THROW_INFO(pDevice->CreateBuffer(&transformCBufDesc, &transformData, pTransformCBuf.GetAddressOf()));
+
+	pContext->VSSetConstantBuffers(0u, 1u, pTransformCBuf.GetAddressOf());
+
+	//////////////////////////////////////////////////////////////////////////
+	// Update Time Constant buffer
+	//////////////////////////////////////////////////////////////////////////
 
 	typedef struct cbufferEx
 	{
 		float timeVal;
 		float padding[3];
 	} timeData;
-
+	static float accumTime = 0.f;
+	accumTime += dT;
 	timeData t;
-	t.timeVal = tInS.count();
+	t.timeVal = accumTime;
 	t.padding[0] = 0.f; t.padding[1] = 1.f; t.padding[2] = 0.5f;
 
 
@@ -268,7 +344,7 @@ void Graphics::Draw()
 		pContext->Unmap(pConstantBuffer.Get(), 0u);
 	}
 	// Set the constant buffer, will associate it with the most recently set pixel shader
-	pContext->PSSetConstantBuffers(0u, 1u, pConstantBuffer.GetAddressOf());
+	pContext->PSSetConstantBuffers(1u, 1u, pConstantBuffer.GetAddressOf());
 
 	//////////////////////////////////////////////////////////////////////////
 	// INPUT LAYOUT GOING TO THE SHADER SETUP
@@ -281,7 +357,7 @@ void Graphics::Draw()
 		{
 			"Position", // Shader semantics hina tara
 			0u,
-			DXGI_FORMAT_R32G32_FLOAT,               // 3 Floats specifying a single element
+			DXGI_FORMAT_R32G32B32_FLOAT,               // 3 Floats specifying a single element
 			0u,
 			D3D11_APPEND_ALIGNED_ELEMENT ,
 			D3D11_INPUT_PER_VERTEX_DATA,
@@ -290,7 +366,7 @@ void Graphics::Draw()
 		{
 			"Color",
 			0u,
-			DXGI_FORMAT_R32G32B32_FLOAT,
+			DXGI_FORMAT_R8G8B8A8_UNORM,
 			0u,
 			D3D11_APPEND_ALIGNED_ELEMENT,
 			D3D11_INPUT_PER_VERTEX_DATA,
@@ -319,6 +395,6 @@ void Graphics::Draw()
 	pContext->IASetPrimitiveTopology(topology);
 
 
-	pContext->DrawIndexed(3u, 0u, 0u);
+	pContext->DrawIndexed(36u, 0u, 0u);
 
 }

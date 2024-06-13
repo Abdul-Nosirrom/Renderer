@@ -21,7 +21,7 @@ public:
 	/// @brief	Presents the back buffer to the front buffer which is the screen (SwapBuffer)
 	void EndFrame();
 
-	void Draw();
+	void Draw(float dT);
 	Microsoft::WRL::ComPtr<ID3D11Buffer> pConstantBuffer; // Testing constant buffer passing data to shader
 
 	void SetClearColor(float Color[4]) { m_ClearColor[0] = Color[0]; m_ClearColor[1] = Color[1]; m_ClearColor[2] = Color[2]; m_ClearColor[3] = 1; }
@@ -34,6 +34,8 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> pContext;
 	Microsoft::WRL::ComPtr<IDXGISwapChain> pSwapChain;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pRenderTarget;
+
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDSView;
 
 	
 #ifdef _DEBUG
