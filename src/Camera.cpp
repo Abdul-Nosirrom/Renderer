@@ -17,7 +17,7 @@ void Camera::Update(float dT)
 	mousePosDelta = m_Mouse->GetPos();
 
 	std::pair<float, float> mouseDelta = { mouseMoveDelta.first * rotSpeed * dT/800.f, mouseMoveDelta.second * rotSpeed * dT/600.f };
-	if (/*!m_Mouse->RightIsPressed() ||*/ (!bMouseInWindow && m_Mouse->IsInWindow()))
+	if (!m_Mouse->RightIsPressed() || (!bMouseInWindow && m_Mouse->IsInWindow()))
 	{
 		mouseDelta = { 0.f, 0.f };
 	}
@@ -26,6 +26,7 @@ void Camera::Update(float dT)
 	std::pair<float, float> moveDelta;
 	moveDelta.first = moveSpeed * dT * (m_Keyboard->KeyIsPressed(0x57) ? 1.f : (m_Keyboard->KeyIsPressed(0x53) ? -1.f : 0.f)); // ws
 	moveDelta.second = moveSpeed * dT * (m_Keyboard->KeyIsPressed(0x44) ? 1.f : (m_Keyboard->KeyIsPressed(0x41) ? -1.f : 0.f)); // ad
+	const float verticalMoveDelta = moveSpeed * dT * (m_Keyboard->KeyIsPressed(0x51) ? 1.f : (m_Keyboard->KeyIsPressed(0x45) ? -1.f : 0.f)); // qe
 	//~
 	
 	// Set rotation transforms
@@ -37,16 +38,14 @@ void Camera::Update(float dT)
 	// ~
 
 	// Set position transforms
-	XMVECTOR MoveDelta = XMVECTOR({ moveDelta.second, 0.f, moveDelta.first, 1.f });
+	XMVECTOR MoveDelta = XMVECTOR({ moveDelta.second, verticalMoveDelta, moveDelta.first, 1.f });
 	MoveDelta = XMVector3Transform(MoveDelta, Rotation);
 	m_Pos = XMVectorAdd(m_Pos, MoveDelta);
 	// ~
 
 	// Compute view matrix
-	m_ViewProjMat = XMMatrixTranspose(
-		XMMatrixLookAtLH(m_Pos, XMVectorAdd(m_Pos, lookVector), XMVectorSet(0.f, 1.f, 0.f, 0.f))
-		* XMMatrixPerspectiveLH(1.f, 3.f / 4.f, 0.5f, 100.f)
-	);
+	m_CameraTransform = XMMatrixLookAtLH(m_Pos, XMVectorAdd(m_Pos, lookVector), XMVectorSet(0.f, 1.f, 0.f, 0.f));
+
 	//
 }
 

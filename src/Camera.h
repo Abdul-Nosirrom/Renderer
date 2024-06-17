@@ -33,10 +33,10 @@ public:
 
 	void SetIO(class Keyboard* keyboard, class Mouse* mouse) noexcept;
 
-	inline DirectX::XMMATRIX GetViewProjMatrix() { return m_ViewProjMat;  }
+	DirectX::XMMATRIX GetTransform() { return m_CameraTransform;  }
 
 private:
-	DirectX::XMMATRIX m_ViewProjMat;
+	DirectX::XMMATRIX m_CameraTransform;
 
 	DirectX::XMVECTOR m_Pos;
 	float m_Pitch, m_Yaw;

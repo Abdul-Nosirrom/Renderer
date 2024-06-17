@@ -148,27 +148,49 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="shaders\Shaders.hlsl" />
+    <ClCompile Include="src\Graphics\Bindables\IndexBuffer.cpp" />
+    <ClCompile Include="src\Graphics\Bindables\InputLayout.cpp" />
+    <ClCompile Include="src\Graphics\Bindables\Shaders.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Errors\DXGIInfoManager.cpp" />
     <ClCompile Include="src\Errors\DXGIMessageMap.cpp" />
+    <ClCompile Include="src\Graphics\Bindables\Topology.cpp" />
+    <ClCompile Include="src\Graphics\Bindables\TransformCBuffer.cpp" />
+    <ClCompile Include="src\Graphics\Bindables\VertexBuffer.cpp" />
     <ClCompile Include="src\Graphics\Graphics.cpp" />
     <ClCompile Include="src\EntryPoint.cpp" />
+    <ClCompile Include="src\Graphics\Types\IDrawable.cpp" />
+    <ClCompile Include="src\Graphics\Types\PrimitiveGeometry.cpp" />
     <ClCompile Include="src\IO\Keyboard.cpp" />
     <ClCompile Include="src\IO\Mouse.cpp" />
+    <ClCompile Include="src\TestApp.cpp" />
     <ClCompile Include="src\Window.cpp" />
     <ClCompile Include="src\Errors\WindowsMessageMap.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Graphics\Bindables\BindablesCommon.h" />
+    <ClInclude Include="src\Graphics\Bindables\ConstantBuffers.h" />
+    <ClInclude Include="src\Graphics\Bindables\IndexBuffer.h" />
+    <ClInclude Include="src\Graphics\Bindables\InputLayout.h" />
+    <ClInclude Include="src\Graphics\Bindables\Shaders.h" />
+    <ClInclude Include="src\Graphics\Bindables\IBindable.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Errors\DXGIInfoManager.h" />
     <ClInclude Include="src\Errors\DXGIMessageMap.h" />
     <ClInclude Include="src\Errors\GraphicsExceptions.h" />
+    <ClInclude Include="src\Graphics\Bindables\Topology.h" />
+    <ClInclude Include="src\Graphics\Bindables\TransformCBuffer.h" />
+    <ClInclude Include="src\Graphics\Bindables\VertexBuffer.h" />
     <ClInclude Include="src\Graphics\Graphics.h" />
     <ClInclude Include="src\Errors\RomanceException.h" />
     <ClInclude Include="src\Errors\WindowExceptions.h" />
+    <ClInclude Include="src\Graphics\RenderResourcePool.h" />
+    <ClInclude Include="src\Graphics\Types\IDrawable.h" />
+    <ClInclude Include="src\Graphics\Types\PrimitiveGeometry.h" />
     <ClInclude Include="src\IO\Keyboard.h" />
     <ClInclude Include="src\IO\Mouse.h" />
     <ClInclude Include="src\RomanceWin.h" />
+    <ClInclude Include="src\TestApp.h" />
     <ClInclude Include="src\Window.h" />
     <ClInclude Include="src\Errors\WindowsMessageMap.h" />
   </ItemGroup>

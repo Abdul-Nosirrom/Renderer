@@ -1,12 +1,12 @@
 #include "Graphics.h"
 #include "Errors/GraphicsExceptions.h"
+#include "Camera.h"
 
 // namespace for our com ptrs
 namespace wrl = Microsoft::WRL;
 
 // Specify linking to d3d11 library (here instead of project settings)
 #pragma comment(lib, "d3d11.lib")
-#pragma comment(lib, "d3dcompiler.lib")
 #pragma comment(lib, "DXGI.lib")
 
 
@@ -138,263 +138,23 @@ void Graphics::StartFrame() noexcept
 void Graphics::EndFrame()
 {
 	GFX_DEVICE_REMOVED_EXCEPT(pSwapChain->Present(1, 0u));
+
+	// Bind for next frame as it gets unbound during Present when swap effect is set to DXGI_SWAP_EFFECT_FLIP_DISCARD
+	pContext->OMSetRenderTargets(1u, pRenderTarget.GetAddressOf(), pDSView.Get());
+
 }
 
-//////////////////////////////////////////////////////////////////////////
-/************************************************************************/
-/* Drawing Tests                                                         
-/************************************************************************/
-//////////////////////////////////////////////////////////////////////////
-
-#include <d3dcompiler.h>
-#include <chrono>
-#include <DirectXMath.h>
-#include "Camera.h"
-
-void Graphics::Draw(float dT)
+DirectX::XMMATRIX Graphics::GetCameraTransform() const noexcept
 {
-	//////////////////////////////////////////////////////////////////////////
-	// VERTEX & INDEX BUFFER SETUP
-	//////////////////////////////////////////////////////////////////////////
-	struct vertex
-	{
-		float x, y, z;
-		unsigned char r, g, b, a;
-	};
+	return Camera::Get().GetTransform();
+}
 
-	constexpr vertex cubeVerts[8] =
-	{
-		{-1, -1, -1,	255, 0, 0},
-		{1, -1, -1,		0, 255, 0},
-		{-1, 1, -1,		0, 0, 255},
-		{1, 1, -1,		255, 255, 0},
-		{-1, -1, 1,		255, 0, 255},
-		{1, -1, 1,		0, 255, 255},
-		{-1, 1, 1,		0, 0, 0},
-		{1, 1, 1,		255, 255, 255}
-	};
+DirectX::XMMATRIX Graphics::GetProjection() const noexcept
+{
+	return DirectX::XMMatrixPerspectiveLH(1.f, 3.f / 4.f, 0.5f, 100.f);
+}
 
-	UINT stride = sizeof(vertex);
-	UINT offset = 0u;
-
-	constexpr unsigned short idxData[36] =
-	{
-		0,2,1, 2,3,1,
-		1,3,5, 3,7,5,
-		2,6,3, 3,6,7,
-		4,5,7, 4,7,6,
-		0,4,2, 2,4,6,
-		0,1,4, 1,5,4
-	};
-
-	D3D11_BUFFER_DESC vbd;
-	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vbd.Usage = D3D11_USAGE_DEFAULT;
-	vbd.CPUAccessFlags = 0u;
-	vbd.MiscFlags = 0u;
-	vbd.ByteWidth = sizeof(cubeVerts);
-	vbd.StructureByteStride = sizeof(vertex);
-	
-	D3D11_SUBRESOURCE_DATA data;
-	data.pSysMem = cubeVerts;
-
-	wrl::ComPtr<ID3D11Buffer> pBuffer;
-	
-	GFX_THROW_INFO(pDevice->CreateBuffer(&vbd, &data, pBuffer.GetAddressOf()));
-
-	pContext->IASetVertexBuffers(0u, 1u, pBuffer.GetAddressOf(), &stride, &offset);
-
-	// Set index buffer
-	D3D11_BUFFER_DESC idb;
-	idb.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	idb.Usage = D3D11_USAGE_DEFAULT;
-	idb.CPUAccessFlags = 0u;
-	idb.MiscFlags = 0u;
-	idb.ByteWidth = sizeof(idxData);
-	idb.StructureByteStride = sizeof(unsigned short);
-
-	D3D11_SUBRESOURCE_DATA idata;
-	idata.pSysMem = idxData;
-
-	wrl::ComPtr<ID3D11Buffer> pIBuffer;
-	GFX_THROW_INFO(pDevice->CreateBuffer(&idb, &idata, pIBuffer.GetAddressOf()));
-	pContext->IASetIndexBuffer(pIBuffer.Get(), DXGI_FORMAT_R16_UINT, 0u);
-
-	//////////////////////////////////////////////////////////////////////////
-	// SHADER COMPILATION AND SETUP
-	//////////////////////////////////////////////////////////////////////////
-	
-	// Shader
-	auto CompileShader = [&](const std::wstring& path, const char* entryPoint, const char* profile, ID3DBlob** ppBlob)
-	{
-		Microsoft::WRL::ComPtr<ID3DBlob> pErrorBlob;
-
-		UINT flags = 0u; //D3DCOMPILE_ENABLE_STRICTNESS;
-
-		// Cant use throw macro, have to retrieve error msg from pErrorBlob
-		HRESULT compHR = D3DCompileFromFile(
-			path.c_str(),
-			nullptr,
-			nullptr,
-			entryPoint,
-			profile,
-			flags, 0u, ppBlob, &pErrorBlob);
-
-		if (compHR < 0)
-		{
-			if (pErrorBlob != nullptr)
-			{
-				auto err = (char*)pErrorBlob->GetBufferPointer();
-				throw GFXException(__LINE__, __FILE__, compHR, { err });
-			}
-			else
-			{
-				GFX_THROW_INFO(compHR);
-			}
-		}
-	};
-
-	
-	// Compile shaders
-	
-	wrl::ComPtr<ID3DBlob> pVSBytecodeBlob;
-	wrl::ComPtr<ID3DBlob> pPSBytecodeBlob;
-
-	wrl::ComPtr<ID3D11VertexShader> pVertexShader;
-	wrl::ComPtr<ID3D11PixelShader> pPixelShader;
-
-
-	CompileShader(L"shaders/Shaders.hlsl", "VSMain", "vs_5_0", &pVSBytecodeBlob);
-	CompileShader(L"shaders/Shaders.hlsl", "PSMain", "ps_5_0", &pPSBytecodeBlob);
-
-
-	// Create shader from compiled bytecode
-	GFX_THROW_INFO(pDevice->CreateVertexShader(pVSBytecodeBlob->GetBufferPointer(), pVSBytecodeBlob->GetBufferSize(), nullptr, &pVertexShader));
-	GFX_THROW_INFO(pDevice->CreatePixelShader(pPSBytecodeBlob->GetBufferPointer(), pPSBytecodeBlob->GetBufferSize(), nullptr, &pPixelShader));
-
-	// Set the shaders
-	pContext->VSSetShader(pVertexShader.Get(), nullptr, 0u);
-	pContext->PSSetShader(pPixelShader.Get(), nullptr, 0u);
-
-	//////////////////////////////////////////////////////////////////////////
-	// View Projection Matrix Constant Buffer
-	//////////////////////////////////////////////////////////////////////////
-
-	struct TransformCBuf
-	{
-		DirectX::XMMATRIX viewProjmat;
-	};
-
-	TransformCBuf transformMat = { Camera::Get().GetViewProjMatrix() };
-
-	wrl::ComPtr<ID3D11Buffer> pTransformCBuf;
-	D3D11_BUFFER_DESC transformCBufDesc = {};
-	transformCBufDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	transformCBufDesc.Usage = D3D11_USAGE_DYNAMIC;
-	transformCBufDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	transformCBufDesc.MiscFlags = 0u;
-	transformCBufDesc.ByteWidth = sizeof(DirectX::XMMATRIX);
-	transformCBufDesc.StructureByteStride = 0u;
-
-	D3D11_SUBRESOURCE_DATA transformData = {};
-	transformData.pSysMem = &transformMat;
-
-	GFX_THROW_INFO(pDevice->CreateBuffer(&transformCBufDesc, &transformData, pTransformCBuf.GetAddressOf()));
-
-	pContext->VSSetConstantBuffers(0u, 1u, pTransformCBuf.GetAddressOf());
-
-	//////////////////////////////////////////////////////////////////////////
-	// Update Time Constant buffer
-	//////////////////////////////////////////////////////////////////////////
-
-	typedef struct cbufferEx
-	{
-		float timeVal;
-		float padding[3];
-	} timeData;
-	static float accumTime = 0.f;
-	accumTime += dT;
-	timeData t;
-	t.timeVal = accumTime;
-	t.padding[0] = 0.f; t.padding[1] = 1.f; t.padding[2] = 0.5f;
-
-
-	// If we don't have a CBuffer, create it, otherwise update it
-	if (!pConstantBuffer)
-	{
-		D3D11_BUFFER_DESC cbuf = { 0 };
-		cbuf.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		cbuf.Usage = D3D11_USAGE_DYNAMIC;
-		cbuf.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-		cbuf.MiscFlags = 0u;
-		cbuf.ByteWidth = sizeof(cbufferEx);
-		cbuf.StructureByteStride = sizeof(float);
-
-		D3D11_SUBRESOURCE_DATA cbufData;
-		cbufData.pSysMem = &t;
-
-		GFX_THROW_INFO(pDevice->CreateBuffer(&cbuf, &cbufData, pConstantBuffer.GetAddressOf()));
-	}
-	else
-	{
-		// Retrieve data, set it, then update it
-		D3D11_MAPPED_SUBRESOURCE cbufMap;
-		GFX_THROW_INFO(pContext->Map(pConstantBuffer.Get(), 0u, D3D11_MAP_WRITE_DISCARD, 0u, &cbufMap));
-		memcpy(cbufMap.pData, &t, sizeof(t));
-		pContext->Unmap(pConstantBuffer.Get(), 0u);
-	}
-	// Set the constant buffer, will associate it with the most recently set pixel shader
-	pContext->PSSetConstantBuffers(1u, 1u, pConstantBuffer.GetAddressOf());
-
-	//////////////////////////////////////////////////////////////////////////
-	// INPUT LAYOUT GOING TO THE SHADER SETUP
-	//////////////////////////////////////////////////////////////////////////
-	
-	// Specify our input layout (after creating the shader because it'll then have to check it with the inputs to the shader)
-	wrl::ComPtr<ID3D11InputLayout> pInputLayout;
-	const std::vector<D3D11_INPUT_ELEMENT_DESC> ied =
-	{
-		{
-			"Position", // Shader semantics hina tara
-			0u,
-			DXGI_FORMAT_R32G32B32_FLOAT,               // 3 Floats specifying a single element
-			0u,
-			D3D11_APPEND_ALIGNED_ELEMENT ,
-			D3D11_INPUT_PER_VERTEX_DATA,
-			0u
-		},
-		{
-			"Color",
-			0u,
-			DXGI_FORMAT_R8G8B8A8_UNORM,
-			0u,
-			D3D11_APPEND_ALIGNED_ELEMENT,
-			D3D11_INPUT_PER_VERTEX_DATA,
-			0u
-		}
-	};
-
-	GFX_THROW_INFO(pDevice->CreateInputLayout(ied.data(), UINT(ied.size()), pVSBytecodeBlob->GetBufferPointer(), pVSBytecodeBlob->GetBufferSize(), &pInputLayout));
-	pContext->IASetInputLayout(pInputLayout.Get());
-
-	//////////////////////////////////////////////////////////////////////////
-	// Rasterizer State & Object Merger
-	//////////////////////////////////////////////////////////////////////////
-
-	// Here we'd set the viewport but that's only necessary if it has changd
-
-
-	// Bind render targets for this draw
-	pContext->OMSetRenderTargets(1u, pRenderTarget.GetAddressOf(), nullptr);
-
-	//////////////////////////////////////////////////////////////////////////
-	// Set primitive topoogy then call draw
-	//////////////////////////////////////////////////////////////////////////
-
-	D3D11_PRIMITIVE_TOPOLOGY topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-	pContext->IASetPrimitiveTopology(topology);
-
-
-	pContext->DrawIndexed(36u, 0u, 0u);
-
+void Graphics::DrawIndexed(UINT indexCount)
+{
+	GFX_THROW_INFO_ONLY(pContext->DrawIndexed(indexCount, 0u, 0u));
 }

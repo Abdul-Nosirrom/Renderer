@@ -1,43 +1,33 @@
 
-struct TimeData
+cbuffer TransformCBuffer
 {
-	float time;
-	float3 padding;
+	matrix modelMatrix;
+	matrix modelView;
+	matrix modelViewProj;
 };
 
-cbuffer Transforms : register(b0)
-{
-	matrix viewproj;
-};
-
-cbuffer TimeBuffer : register(b1)
-{
-	TimeData tData;
-};
-
-struct VS_INPUT
-{
-	float3 pos : POSITION;
-	float3 cData : COLOR;
-};
-
-struct VS_OUT
+struct Interpolator
 {
 	float4 pos : SV_POSITION;
-	float3 cData : COLOR;
+	float4 worldPos : TEXCOORD0;
+	float3 color : COLOR;
 };
 
-VS_OUT VSMain( VS_INPUT vsin )
+Interpolator VSMain( float3 pos : POSITION)
 {
-	VS_OUT outd;
-	outd.pos = mul(float4(vsin.pos, 1.f), viewproj);
-	outd.cData = vsin.cData;
-
+	Interpolator outd;
+	outd.pos = mul(float4(pos, 1.f), modelViewProj);
+	outd.color = outd.pos / 1.f;
+	outd.worldPos = mul(float4(pos, 1.f), modelMatrix);
 	return outd;
 }
 
-float4 PSMain(VS_OUT inData) : SV_TARGET
+float4 PSMain(Interpolator interpolators) : SV_TARGET
 {
-	return float4(pow(sin(tData.time), 2) * inData.cData, 1.f);
-	//return float4(0.f, 1.f, 0.f, 1.f);
+	const float distToOrigin = distance(interpolators.worldPos.xyz, float3(0,0,0));
+	if (distToOrigin >= 10.f) discard;
+
+	return float4(1.f, 1.f, 1.f, 1.f) * distToOrigin / 50.f;
+	//return float4(interpolators.color, 1.f);
+	//return float4(1,1,1,1);
 }

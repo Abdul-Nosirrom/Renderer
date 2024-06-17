@@ -20,6 +20,12 @@
 	#define GFX_DEVICE_REMOVED_EXCEPT(hrcall) if (HRESULT hr2 = hrcall; FAILED(hr2)) { if (hr2 == DXGI_ERROR_DEVICE_REMOVED) throw GFXDeviceRemovedException(__LINE__, __FILE__, pDevice->GetDeviceRemovedReason()); else GFX_EXCEPT(hr2); }
 #endif
 
+#ifdef _DEBUG 
+	#define INFOMAN(gfx) DXGIInfoManager& m_InfoManager = GetInfoManager(gfx)
+#else 
+	#define INFOMAN(gfx)
+#endif 
+
 /// @brief  Exception class that handles HResults
 class GFXException : public RomanceException
 {

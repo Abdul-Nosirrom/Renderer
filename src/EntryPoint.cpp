@@ -1,8 +1,6 @@
 #include "RomanceWin.h"
-#include "Window.h"
-#include "Camera.h"
 #include "Errors/RomanceException.h"
-#include <chrono>
+#include "TestApp.h"
 
 /// <summary>
 /// For a "Windows" application, the default entry point is WinMain, NOT Main
@@ -18,36 +16,7 @@ int main(int argc, char* argv[]) // SUBSYSTEM:CONSOLE, using default main() sign
 {
 	try
 	{
-		Window newWind(800, 600, "Renderer");
-		float ClearColor[4] = { 0.5, 0, 0, 1 };
-		newWind.GFX().SetClearColor(ClearColor);
-		// BEGIN time tests
-		typedef std::chrono::high_resolution_clock Time;
-		typedef std::chrono::milliseconds ms;
-		typedef std::chrono::duration<float> fsec;
-		float dt = 0.f;
-		// ~
-		while (true)
-		{
-			auto t0 = Time::now();
-
-			// Process all messages pending
-			if (const auto ecode = Window::ProcessMessages())
-			{
-				// if return optional has a value, that means its an exit code
-				return *ecode;
-			}
-
-			Camera::Get().Update(dt);
-
-			newWind.GFX().StartFrame(); // Clears render target
-			newWind.GFX().Draw(dt); // Sets all buffers/pipeline state then calls draw
-			newWind.GFX().EndFrame(); // Presents the backbuffer
-
-			auto t1 = Time::now();
-			fsec tInS = t1 - t0;
-			dt = tInS.count();
-		}
+		TestApp().Go();
 	}
 	catch (const RomanceException& e)
 	{
