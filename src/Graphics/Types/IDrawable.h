@@ -23,6 +23,8 @@ public:
     
     void Draw(Graphics& gfx) const;
 
+    virtual void Update(Graphics& gfx, float DeltaTime) {};
+
     virtual DirectX::XMMATRIX GetTransformMatrix() const noexcept = 0;
 
 protected:

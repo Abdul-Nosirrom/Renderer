@@ -15,7 +15,7 @@ VertexBuffer::VertexBuffer(Graphics& gfx, const std::string& poolTag, const Vert
     vbd.Usage = D3D11_USAGE_DEFAULT;
     vbd.CPUAccessFlags = 0u;
     vbd.MiscFlags = 0u;
-    vbd.ByteWidth = vertexData.GetByteSize();
+    vbd.ByteWidth = (UINT)vertexData.GetByteSize();
     vbd.StructureByteStride = m_Stride;
 
     D3D11_SUBRESOURCE_DATA vbsd = {};

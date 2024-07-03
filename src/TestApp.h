@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Window.h"
 #include "Graphics/Types/PrimitiveGeometry.h"
+#include "OdaTimer.h"
 
 class TestApp
 {
@@ -10,9 +11,10 @@ public:
     ~TestApp();
 
 private:
-    void Render();
+    void RunFrame();
 
 private:
     Window m_Window;
-    std::vector<std::unique_ptr<PrimitiveGeometry::Cube>> Drawables;
+    OdaTimer m_Timer;
+    std::vector<std::unique_ptr<PrimitiveDrawable>> Drawables;
 };

@@ -156,5 +156,15 @@ DirectX::XMMATRIX Graphics::GetProjection() const noexcept
 
 void Graphics::DrawIndexed(UINT indexCount)
 {
+	// Temp wire-frame debug
+	{
+		wrl::ComPtr<ID3D11RasterizerState> pRSS;
+		D3D11_RASTERIZER_DESC rsd = {};
+		rsd.FillMode = D3D11_FILL_WIREFRAME;
+		rsd.CullMode = D3D11_CULL_BACK;
+
+		GFX_THROW_INFO(pDevice->CreateRasterizerState(&rsd, &pRSS));
+		//pContext->RSSetState(pRSS.Get());
+	}
 	GFX_THROW_INFO_ONLY(pContext->DrawIndexed(indexCount, 0u, 0u));
 }

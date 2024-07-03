@@ -148,6 +148,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="shaders\Shaders.hlsl" />
+    <ClCompile Include="src\Graphics\Meshes\PrimitiveMesh.cpp" />
     <ClCompile Include="src\Graphics\Bindables\IndexBuffer.cpp" />
     <ClCompile Include="src\Graphics\Bindables\InputLayout.cpp" />
     <ClCompile Include="src\Graphics\Bindables\Shaders.cpp" />
@@ -168,6 +169,8 @@
     <ClCompile Include="src\Errors\WindowsMessageMap.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Graphics\Meshes\Mesh.h" />
+    <ClInclude Include="src\Graphics\Meshes\PrimitiveMesh.h" />
     <ClInclude Include="src\Graphics\Bindables\BindablesCommon.h" />
     <ClInclude Include="src\Graphics\Bindables\ConstantBuffers.h" />
     <ClInclude Include="src\Graphics\Bindables\IndexBuffer.h" />
@@ -189,6 +192,7 @@
     <ClInclude Include="src\Graphics\Types\PrimitiveGeometry.h" />
     <ClInclude Include="src\IO\Keyboard.h" />
     <ClInclude Include="src\IO\Mouse.h" />
+    <ClInclude Include="src\OdaTimer.h" />
     <ClInclude Include="src\RomanceWin.h" />
     <ClInclude Include="src\TestApp.h" />
     <ClInclude Include="src\Window.h" />

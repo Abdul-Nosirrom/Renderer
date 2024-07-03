@@ -1,60 +1,76 @@
 ﻿#include "PrimitiveGeometry.h"
-
-#include "Graphics/Bindables/BindablesCommon.h"
-
+#include <random>
 #include <iostream>
 
-using namespace PrimitiveGeometry;
 using namespace RenderResource;
 
-Cube::Cube(Graphics& gfx)
+PrimitiveDrawable::PrimitiveDrawable(Graphics& gfx)
 {
-    const auto geoTag = "$cube.";
-    
-    VertexFactory cubeDescriptor;
-    {
-        cubeDescriptor.AddVertex({-1, -1, -1});
-        cubeDescriptor.AddVertex({1, -1, -1});
-        cubeDescriptor.AddVertex({-1, 1, -1});
-        cubeDescriptor.AddVertex({1, 1, -1});
-        cubeDescriptor.AddVertex({-1, -1, 1});
-        cubeDescriptor.AddVertex({1, -1, 1});
-        cubeDescriptor.AddVertex({-1, 1, 1});
-        cubeDescriptor.AddVertex({1, 1, 1});
-    }
-
-    const std::vector<unsigned short> idxData =
-    {
-        0,2,1, 2,3,1,
-        1,3,5, 3,7,5,
-        2,6,3, 3,6,7,
-        4,5,7, 4,7,6,
-        0,4,2, 2,4,6,
-        0,1,4, 1,5,4
-    };
-
-    // Geo Buffers
-    AddBindable(VertexBuffer::Resolve(gfx, geoTag, cubeDescriptor));
-    AddBindable(IndexBuffer::Resolve(gfx, geoTag, idxData));
-
-    // Shaders
-    auto pVS = VertexShader::Resolve(gfx, "shaders/Shaders.hlsl");
-    auto pVSByteCode = pVS->GetBytecode(); // Retrieve to feed input input layout
-    AddBindable(std::move(pVS));
-    
-    AddBindable(PixelShader::Resolve(gfx, "shaders/Shaders.hlsl"));
-
-    // Shader Data
-    AddBindable(InputLayout::Resolve(gfx, pVSByteCode));
-
-    // Topology
-    AddBindable(Topology::Resolve(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
-    
-    // Constant Buffers
-    AddBindable(std::make_shared<TransformCBuffer>(gfx, *this));
+	InitMesh(gfx, PrimitiveMesh::EType::Cube);
 }
 
-DirectX::XMMATRIX Cube::GetTransformMatrix() const noexcept
+PrimitiveDrawable::PrimitiveDrawable(Graphics& gfx, PrimitiveMesh::EType MeshType)
 {
-    return DirectX::XMMatrixRotationRollPitchYaw(m_Rot.x, m_Rot.y, m_Rot.z) * DirectX::XMMatrixTranslation(m_Pos.x, m_Pos.y, m_Pos.z);
+	InitMesh(gfx, MeshType);
+}
+
+void PrimitiveDrawable::InitMesh(Graphics& gfx, PrimitiveMesh::EType MeshType)
+{
+	PrimitiveMesh MeshObj(MeshType);
+	VertexFactory meshDescriptor = MeshObj.GetVertices();
+	auto idxData = MeshObj.GetIndices();
+	const auto geoTag = MeshObj.GetPoolTag();
+
+	// Geo Buffers
+	AddBindable(VertexBuffer::Resolve(gfx, geoTag, meshDescriptor));
+	AddBindable(IndexBuffer::Resolve(gfx, geoTag, idxData));
+
+	// Shaders
+	auto pVS = VertexShader::Resolve(gfx, "shaders/Shaders.hlsl");
+	auto pVSByteCode = pVS->GetBytecode(); // Retrieve to feed input input layout
+	AddBindable(std::move(pVS));
+
+	AddBindable(PixelShader::Resolve(gfx, "shaders/Shaders.hlsl"));
+
+	// Time constant buffer
+	AddBindable(VertexConstantBuffer<TimeCBufData>::Resolve(gfx, 1));
+
+
+	// Shader Data
+	AddBindable(InputLayout::Resolve(gfx, pVSByteCode));
+
+	// Topology
+	AddBindable(Topology::Resolve(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
+
+	// Constant Buffers
+	AddBindable(std::make_shared<TransformCBuffer>(gfx, *this));
+
+
+	// Test code, base pos
+	std::random_device dev;
+	std::mt19937 rng(dev());
+	std::uniform_int_distribution<std::mt19937::result_type> posDist(0, 50); // distribution in range [1, 6]
+	std::uniform_int_distribution<std::mt19937::result_type> rotDist(0, 360); // distribution in range [1, 6]
+	std::uniform_int_distribution<std::mt19937::result_type> rotvelDist(1, 4); // rotational vel distribution in range 
+
+
+	SetPos({ (float)posDist(rng) - 25.f, (float)posDist(rng) - 25.f, (float)posDist(rng) - 25.f });
+	SetRot({ (float)rotDist(rng), (float)rotDist(rng), (float)rotDist(rng) });
+
+	m_RotVelocity = { (float)rotvelDist(rng)*0.f, (float)rotvelDist(rng) - 2.5f, (float)rotvelDist(rng)*0.f };
+
+}
+
+
+DirectX::XMMATRIX PrimitiveDrawable::GetTransformMatrix() const noexcept
+{
+	const float accumTime = timeAccum.timedata[0];
+	DirectX::XMFLOAT3 WorldRot = { m_RotVelocity.x * accumTime, m_RotVelocity.y * accumTime, m_RotVelocity.z * accumTime };
+	return DirectX::XMMatrixRotationRollPitchYaw(m_Rot.x, m_Rot.y, m_Rot.z) * DirectX::XMMatrixTranslation(m_Pos.x, m_Pos.y, m_Pos.z) * DirectX::XMMatrixRotationRollPitchYaw(WorldRot.x, WorldRot.y, WorldRot.z);
+}
+
+void PrimitiveDrawable::Update(Graphics& gfx, float DeltaTime)
+{
+	timeAccum.timedata[0] += DeltaTime;
+	GetBindable<VertexConstantBuffer<TimeCBufData>>()->Update(gfx, timeAccum);
 }

@@ -7,7 +7,7 @@ using namespace RenderResource;
 
 IndexBuffer::IndexBuffer(Graphics& gfx, const std::string& poolTag,
     const std::vector<unsigned short>& indices)
-        : m_PoolTag(poolTag), m_Count(indices.size())
+        : m_PoolTag(poolTag), m_Count(UINT(indices.size()))
 {
     INFOMAN(gfx);
 
@@ -16,8 +16,8 @@ IndexBuffer::IndexBuffer(Graphics& gfx, const std::string& poolTag,
     ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
     ibd.CPUAccessFlags = 0u;
     ibd.MiscFlags = 0u;
-    ibd.ByteWidth = m_Count * sizeof(unsigned short);
-    ibd.StructureByteStride = sizeof(unsigned short);
+    ibd.ByteWidth = m_Count * UINT(sizeof(unsigned short));
+    ibd.StructureByteStride = UINT(sizeof(unsigned short));
 
     D3D11_SUBRESOURCE_DATA ibsd = {};
     ibsd.pSysMem = indices.data();
