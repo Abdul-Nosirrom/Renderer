@@ -1,7 +1,5 @@
 #include "PrimitiveMesh.h"
 #include <format>
-
-
 using namespace RenderResource;
 
 void PrimitiveMesh::MakeCube()
@@ -256,7 +254,7 @@ void PrimitiveMesh::MakeSphere(UINT phiSlices, UINT thetaSlices)
 			Vertex vert;
 			vert.SetPosition({ X, Y, Z });
 			vert.SetNormal({ X, Y, Z });
-			//vert.SetUV({ Itheta * 1.f / thetaSlices, Iphi * 1.f / phiSlices });
+			vert.SetUV({ Itheta * 1.f / thetaSlices, Iphi * 1.f / phiSlices });
 			m_Vertices.AddVertex(vert);
 
 			// tri 1
@@ -346,7 +344,7 @@ void PrimitiveMesh::MakeCylinder(UINT radialSlices, float height)
 			Vertex vert;
 			vert.SetPosition({ X, Y, Z });
 			vert.SetNormal({ 0, Iheight == 0 ? -1.f : 1.f, 0 });
-			vert.SetUV({ X, Z });
+			vert.SetUV({ (X + 1.f)/2.f, (Z + 1.f)/2.f});
 			m_Vertices.AddVertex(vert);
 
 			unsigned short radialOffset = radialSlices * Iheight + idxOffset; // Accounting for offset from cap vertices

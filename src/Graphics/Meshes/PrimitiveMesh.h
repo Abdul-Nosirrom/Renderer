@@ -18,7 +18,7 @@ public:
 			MakeCube();
 			break;
 		case PrimitiveMesh::EType::Plane:
-			MakePlane(4);
+			MakePlane(256);
 			break;
 		case PrimitiveMesh::EType::Sphere:
 			MakeSphere(32, 32);

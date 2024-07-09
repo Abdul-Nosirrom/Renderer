@@ -35,6 +35,12 @@ void PrimitiveDrawable::InitMesh(Graphics& gfx, PrimitiveMesh::EType MeshType)
 	// Time constant buffer
 	AddBindable(VertexConstantBuffer<TimeCBufData>::Resolve(gfx, 1));
 
+	// Bind Texture To Pixel Shader
+	AddBindable(Texture::Resolve(gfx, "resources/TextureTest.png", ETextureBindStage::Pixel, 0));
+	AddBindable(Sampler::Resolve(gfx, Sampler::Type::Anisotropic, ETextureBindStage::Pixel, 0));
+
+	AddBindable(Texture::Resolve(gfx, "resources/TextureTest.png", ETextureBindStage::Vertex, 0));
+	AddBindable(Sampler::Resolve(gfx, Sampler::Type::Anisotropic, ETextureBindStage::Vertex, 0));
 
 	// Shader Data
 	AddBindable(InputLayout::Resolve(gfx, pVSByteCode));
@@ -47,7 +53,7 @@ void PrimitiveDrawable::InitMesh(Graphics& gfx, PrimitiveMesh::EType MeshType)
 
 
 	// Test code, base pos
-	std::random_device dev;
+	/*std::random_device dev;
 	std::mt19937 rng(dev());
 	std::uniform_int_distribution<std::mt19937::result_type> posDist(0, 50); // distribution in range [1, 6]
 	std::uniform_int_distribution<std::mt19937::result_type> rotDist(0, 360); // distribution in range [1, 6]
@@ -57,7 +63,7 @@ void PrimitiveDrawable::InitMesh(Graphics& gfx, PrimitiveMesh::EType MeshType)
 	SetPos({ (float)posDist(rng) - 25.f, (float)posDist(rng) - 25.f, (float)posDist(rng) - 25.f });
 	SetRot({ (float)rotDist(rng), (float)rotDist(rng), (float)rotDist(rng) });
 
-	m_RotVelocity = { (float)rotvelDist(rng)*0.f, (float)rotvelDist(rng) - 2.5f, (float)rotvelDist(rng)*0.f };
+	m_RotVelocity = { (float)rotvelDist(rng)*0.f, (float)rotvelDist(rng) - 2.5f, (float)rotvelDist(rng)*0.f };*/
 
 }
 

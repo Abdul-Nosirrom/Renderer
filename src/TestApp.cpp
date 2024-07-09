@@ -7,17 +7,7 @@
 TestApp::TestApp()
     : m_Window(800, 600, "Renderer")
 {
-	std::random_device dev;
-	std::mt19937 rng(dev());
-	std::uniform_int_distribution<std::mt19937::result_type> typeDist(0, 3); 
-
-    for (UINT i = 0; i < 50; i++)
-    {
-        PrimitiveMesh::EType instType = static_cast<PrimitiveMesh::EType>(typeDist(rng));
-        Drawables.push_back(std::make_unique<PrimitiveDrawable>(m_Window.GFX(), instType));
-    }
-
-
+    Drawables.push_back(std::make_unique<PrimitiveDrawable>(m_Window.GFX(), PrimitiveMesh::EType::Sphere));
     float ClearColor[4] = { 0.15f, 0.f, 0.f, 1.f };
     m_Window.GFX().SetClearColor(ClearColor);
 }
@@ -50,7 +40,7 @@ void TestApp::RunFrame()
 
     for (auto& Drawable : Drawables)
     {
-        Drawable->Update(m_Window.GFX(), dt);
+        //Drawable->Update(m_Window.GFX(), dt);
         Drawable->Draw(m_Window.GFX());
     }
 
