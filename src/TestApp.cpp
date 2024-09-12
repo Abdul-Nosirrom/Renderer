@@ -3,46 +3,32 @@
 #include <chrono>
 #include <random>
 #include "Camera.h"
+//#include "ImGuiContext.h"
 
-TestApp::TestApp()
-    : m_Window(800, 600, "Renderer")
+RenderEngine::Application::Application()
+    : m_Window(800, 800, "Renderer")
 {
-    Drawables.push_back(std::make_unique<PrimitiveDrawable>(m_Window.GFX(), PrimitiveMesh::EType::Sphere));
-    float ClearColor[4] = { 0.15f, 0.f, 0.f, 1.f };
-    m_Window.GFX().SetClearColor(ClearColor);
 }
 
-int TestApp::Go()
+int RenderEngine::Application::Run()
 {
-    while (true)
-    {
-        // Process all messages pending
-        if (const auto ecode = Window::ProcessMessages())
-        {
-            // if return optional has a value, that means its an exit code
-            return *ecode;
-        }
-
-        RunFrame();
-    }
+    return 0;
 }
 
-TestApp::~TestApp()
-{}
-
-void TestApp::RunFrame()
+void RenderEngine::Application::RunFrame()
 {
-    const float dt = m_Timer.Mark();
+	const float dt = m_Timer.Mark();
 	Camera::Get().Update(dt);
 
 
-    m_Window.GFX().StartFrame();
+	m_Window.GFX().StartFrame();
 
-    for (auto& Drawable : Drawables)
-    {
-        //Drawable->Update(m_Window.GFX(), dt);
-        Drawable->Draw(m_Window.GFX());
-    }
+	for (auto& Drawable : Drawables)
+	{
+		Drawable->Update(m_Window.GFX(), dt);
+		Drawable->Draw(m_Window.GFX());
+	}
 
-    m_Window.GFX().EndFrame();
+	//ImGuiManager::EndFrame();
+	m_Window.GFX().EndFrame();
 }

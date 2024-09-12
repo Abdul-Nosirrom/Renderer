@@ -2,6 +2,8 @@
 #include "Errors/RomanceException.h"
 #include "TestApp.h"
 
+extern RenderEngine::Application* RenderEngine::CreateApplication();
+
 /// <summary>
 /// For a "Windows" application, the default entry point is WinMain, NOT Main
 /// 'CALLBACK'/'WINAPI' is stdcall, which is an API declspec type thing for functions the window API will call (like this one)
@@ -16,7 +18,9 @@ int main(int argc, char* argv[]) // SUBSYSTEM:CONSOLE, using default main() sign
 {
 	try
 	{
-		TestApp().Go();
+		auto App = RenderEngine::CreateApplication();
+		App->Run();
+		delete App;
 	}
 	catch (const RomanceException& e)
 	{

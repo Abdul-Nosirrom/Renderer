@@ -1,8 +1,8 @@
 #pragma once
-
+#include "Core.h"
 #include <chrono>
 
-class OdaTimer
+class RENDERENGINE_API OdaTimer
 {
 public:
 

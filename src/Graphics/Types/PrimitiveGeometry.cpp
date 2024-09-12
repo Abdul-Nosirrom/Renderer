@@ -33,7 +33,7 @@ void PrimitiveDrawable::InitMesh(Graphics& gfx, PrimitiveMesh::EType MeshType)
 	AddBindable(PixelShader::Resolve(gfx, "shaders/Shaders.hlsl"));
 
 	// Time constant buffer
-	AddBindable(VertexConstantBuffer<TimeCBufData>::Resolve(gfx, 1));
+	AddBindable(PixelConstantBuffer<TimeCBufData>::Resolve(gfx, 1));
 
 	// Bind Texture To Pixel Shader
 	AddBindable(Texture::Resolve(gfx, "resources/TextureTest.png", ETextureBindStage::Pixel, 0));
@@ -78,5 +78,5 @@ DirectX::XMMATRIX PrimitiveDrawable::GetTransformMatrix() const noexcept
 void PrimitiveDrawable::Update(Graphics& gfx, float DeltaTime)
 {
 	timeAccum.timedata[0] += DeltaTime;
-	GetBindable<VertexConstantBuffer<TimeCBufData>>()->Update(gfx, timeAccum);
+	GetBindable<PixelConstantBuffer<TimeCBufData>>()->Update(gfx, timeAccum);
 }

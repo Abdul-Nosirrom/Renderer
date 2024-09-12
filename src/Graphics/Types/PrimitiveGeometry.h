@@ -1,10 +1,11 @@
 ﻿#pragma once
+#include "Core.h"
 #include "IDrawable.h"
 #include "../Meshes/PrimitiveMesh.h"
 #include "Graphics/Bindables/BindablesCommon.h"
 
 
-class PrimitiveDrawable : public IDrawable
+class RENDERENGINE_API PrimitiveDrawable : public IDrawable
 {
 public:
     PrimitiveDrawable() = default;

@@ -72,7 +72,7 @@ Graphics::Graphics(HWND hWnd)
 	// Setup our viewport
 	D3D11_VIEWPORT viewPort = {};
 	viewPort.Width = 800;
-	viewPort.Height = 600;
+	viewPort.Height = 800;
 	viewPort.MinDepth = 0;
 	viewPort.MaxDepth = 1;
 	viewPort.TopLeftX = 0;
@@ -100,7 +100,7 @@ Graphics::Graphics(HWND hWnd)
 	wrl::ComPtr<ID3D11Texture2D> pDSTexture;
 	D3D11_TEXTURE2D_DESC dstDesc = {};
 	dstDesc.Width = 800u;
-	dstDesc.Height = 600u;
+	dstDesc.Height = 800u;
 	dstDesc.MipLevels = 1u; // disable mips for depth texture
 	dstDesc.ArraySize = 1u; // not an array of textures
 	dstDesc.Format = DXGI_FORMAT_D32_FLOAT; // depth texture with no stencil is just D32
@@ -118,6 +118,7 @@ Graphics::Graphics(HWND hWnd)
 	dsvDesc.Texture2D.MipSlice = 0u;
 
 	GFX_THROW_INFO(pDevice->CreateDepthStencilView(pDSTexture.Get(), &dsvDesc, &pDSView));
+	
 
 	// Finally bind the depth stencil view to the object merger
 	pContext->OMSetRenderTargets(1u, pRenderTarget.GetAddressOf(), pDSView.Get());
@@ -151,7 +152,7 @@ DirectX::XMMATRIX Graphics::GetCameraTransform() const noexcept
 
 DirectX::XMMATRIX Graphics::GetProjection() const noexcept
 {
-	return DirectX::XMMatrixPerspectiveLH(1.f, 3.f / 4.f, 0.5f, 100.f);
+	return DirectX::XMMatrixPerspectiveLH(1.f, 1.f, 0.5f, 100.f);
 }
 
 void Graphics::DrawIndexed(UINT indexCount)
@@ -160,8 +161,10 @@ void Graphics::DrawIndexed(UINT indexCount)
 	{
 		wrl::ComPtr<ID3D11RasterizerState> pRSS;
 		D3D11_RASTERIZER_DESC rsd = {};
-		rsd.FillMode = D3D11_FILL_WIREFRAME;
-		rsd.CullMode = D3D11_CULL_BACK;
+		rsd.FillMode = D3D11_FILL_SOLID;
+		rsd.CullMode = D3D11_CULL_FRONT;
+		
+		rsd.FrontCounterClockwise = FALSE;
 
 		GFX_THROW_INFO(pDevice->CreateRasterizerState(&rsd, &pRSS));
 		//pContext->RSSetState(pRSS.Get());

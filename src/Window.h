@@ -8,7 +8,7 @@
 #include <string>
 #include <optional>
 
-class Window
+class RENDERENGINE_API Window
 {
 private:
 	/// @brief	Singleton class managing registration of windows

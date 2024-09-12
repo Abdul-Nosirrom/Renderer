@@ -1,20 +1,26 @@
 ﻿#pragma once
+#include "Core.h"
 #include "Window.h"
 #include "Graphics/Types/PrimitiveGeometry.h"
 #include "OdaTimer.h"
 
-class TestApp
+namespace RenderEngine
 {
-public:
-    TestApp();
-    int Go();
-    ~TestApp();
+    class RENDERENGINE_API Application
+    {
+    public:
+        Application();
+        virtual int Run();
+        virtual ~Application() {};
 
-private:
-    void RunFrame();
+    protected:
+        void RunFrame();
 
-private:
-    Window m_Window;
-    OdaTimer m_Timer;
-    std::vector<std::unique_ptr<PrimitiveDrawable>> Drawables;
-};
+        Window m_Window;
+        OdaTimer m_Timer;
+        std::vector<std::unique_ptr<PrimitiveDrawable>> Drawables;
+    };
+
+    // Definition in Client project
+    Application* CreateApplication();
+}
