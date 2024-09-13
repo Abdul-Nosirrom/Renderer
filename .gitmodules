@@ -1,0 +1,4 @@
+[submodule "RenderEngine/external/imgui"]
+	path = RenderEngine/external/imgui
+	url = https://github.com/ocornut/imgui.git
+	branch = docking
