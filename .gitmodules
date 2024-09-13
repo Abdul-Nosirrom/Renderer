@@ -2,3 +2,6 @@
 	path = RenderEngine/external/imgui
 	url = https://github.com/ocornut/imgui.git
 	branch = docking
+[submodule "RenderEngine/external/eigen"]
+	path = RenderEngine/external/eigen
+	url = https://gitlab.com/libeigen/eigen
