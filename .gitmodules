@@ -5,3 +5,6 @@
 [submodule "RenderEngine/external/eigen"]
 	path = RenderEngine/external/eigen
 	url = https://gitlab.com/libeigen/eigen
+[submodule "RenderEngine/external/assimp"]
+	path = RenderEngine/external/assimp
+	url = https://github.com/assimp/assimp
