@@ -9,6 +9,13 @@ set(CMAKE_CXX_STANDARD 20)
 project(externals)
 add_subdirectory(eigen)
 
+
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(ASSIMP_INJECT_DEBUG_POSTFIX OFF CACHE BOOL "" FORCE)
+set(ASSIMP_INSTALL OFF CACHE BOOL "" FORCE)
+add_subdirectory(assimp)
+
 # Eigen as interface header only library
 #project(Eigen) 
 #set(${Eigen_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/eigen/)

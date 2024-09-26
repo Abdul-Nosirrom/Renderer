@@ -20,6 +20,7 @@ file(GLOB_RECURSE CPP_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h" "${CMAK
 list(APPEND CPP_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/../include/imgui/")
 #list(APPEND CPP_INCLUDE_DIRS "${Eigen_INCLUDE_DIRS}")
 list(APPEND CPP_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/external/eigen")
+#list(APPEND CPP_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/external/assimp/include")
 list(APPEND CPP_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/src/")
 
 # Includ directory
@@ -33,6 +34,8 @@ add_library(${PROJECT_NAME} SHARED
 
 target_link_libraries(${PROJECT_NAME} INTERFACE eigen)
 
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/external/assimp/include")
+target_link_libraries(${PROJECT_NAME} PRIVATE assimp)
 
 # Add preprocessor definitions based on configuration/build type
 add_compile_definitions("-DBUILD_DLL $<$<CONFIG:Debug>:-D_Debug>")

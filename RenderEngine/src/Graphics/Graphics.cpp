@@ -162,7 +162,7 @@ void Graphics::DrawIndexed(UINT indexCount)
 	{
 		wrl::ComPtr<ID3D11RasterizerState> pRSS;
 		D3D11_RASTERIZER_DESC rsd = {};
-		rsd.FillMode = D3D11_FILL_SOLID;
+		rsd.FillMode = D3D11_FILL_WIREFRAME;// | D3D11_FILL_SOLID;
 		rsd.CullMode = D3D11_CULL_BACK;
 		
 		rsd.FrontCounterClockwise = FALSE;

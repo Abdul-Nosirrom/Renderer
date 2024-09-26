@@ -18,7 +18,7 @@ public:
 
     virtual void Update(Graphics& gfx, float DeltaTime) override;
     
-private:
+protected:
     void InitMesh(Graphics& gfx, PrimitiveMesh::EType MeshType);
 
     Vector3 m_Pos = {0.f, 0.f, 0.f};

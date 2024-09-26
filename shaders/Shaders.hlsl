@@ -34,15 +34,16 @@ Interpolator VSMain( float3 pos : POSITION, float2 UVs : TEXCOORD, float3 norm :
 	outd.color = color;
 	outd.normal = mul(norm, (float3x3)modelMatrix); // cast to 3x3 to remove translation from model matrix
 
-	outd.worldPos = mul(float4(pos, 1.f), modelMatrix);
+	outd.worldPos = mul(modelMatrix, float4(pos, 1.f));
 	return outd;
 }
 
 
 float4 PSMain(Interpolator interpolators) : SV_TARGET
 {
-	return testTexture.Sample(testTextureSampler, interpolators.uv);
-	return float4(interpolators.uv, 0, 1);
+	return float4((interpolators.normal + 1)/2, 1.f);
+	//return testTexture.Sample(testTextureSampler, interpolators.uv);
+	//return float4(interpolators.uv, 0, 1);
 	const float3 Ambient = float3(0, 0, 0.3);
 	const float3 LightDir = normalize(float3(-1.f, 0.25f, -0.7f));
 	float3 LightAtten = (dot(LightDir, interpolators.normal) + 1.f)/2.f * float3(1.f, 1.f, 1.f);

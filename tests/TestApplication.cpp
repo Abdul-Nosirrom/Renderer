@@ -6,12 +6,12 @@ public:
 
 	TestApplication()
 	{
-		Vector3 pos(-12.f, 0.f, 0.f);
-		for (int i = 0; i < 25; i++)
+		Vector3 pos(0.f, 0.f, 0.f);
+		for (int i = 0; i < 1; i++)
 		{
-			Drawables.push_back(std::make_unique<PrimitiveDrawable>(m_Window.GFX(), PrimitiveMesh::EType::Cube));
+			Drawables.push_back(std::make_unique<ModelDrawable>(m_Window.GFX(), "resources/max-planck.obj"));
 			Drawables[i].get()->SetPos(pos);
-			pos += Vector3(3.f, 0.f, 0.f);
+			pos += Vector3(10.f, 0.f, 0.f);
 		}
 		float ClearColor[4] = { 0.15f, 0.f, 0.f, 1.f };
 		m_Window.GFX().SetClearColor(ClearColor);

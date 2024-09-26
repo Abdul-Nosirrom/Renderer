@@ -1,5 +1,6 @@
 #include "PrimitiveMesh.h"
 #include <format>
+
 using namespace RenderResource;
 
 void PrimitiveMesh::MakeCube()
