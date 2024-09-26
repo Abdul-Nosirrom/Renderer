@@ -69,6 +69,7 @@ add_executable(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME} PRIVATE RenderEngine)
 
+
 # Copy dll to executable [https://stackoverflow.com/questions/10671916/how-to-copy-dll-files-into-the-same-folder-as-the-executable-using-cmake]
 #add_custom_command(
 #    TARGET ${PROJECT_NAME} POST_BUILD
@@ -95,7 +96,7 @@ add_custom_command(
     TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     ${CMAKE_SOURCE_DIR}/shaders/ $<TARGET_FILE_DIR:${PROJECT_NAME}>/shaders/
-) 
+)
 
 # Post build cleannup command
 # Perform build cleanup

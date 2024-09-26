@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "IBindable.h"
 #include "ConstantBuffers.h"
-#include <DirectXMath.h>
+#include "Math.h"
 #include <memory>
 
 // Forward declaration
@@ -17,9 +17,9 @@ namespace RenderResource
     protected:
         struct Transforms
         {
-            DirectX::XMMATRIX modelMatrix;
-            DirectX::XMMATRIX modelView;
-            DirectX::XMMATRIX modelViewProj;
+            Matrix4x4 modelMatrix;
+            Matrix4x4 modelView;
+            Matrix4x4 modelViewProj;
         };
         
     public:

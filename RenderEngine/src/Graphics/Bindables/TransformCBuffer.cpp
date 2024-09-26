@@ -29,6 +29,13 @@ void TransformCBuffer::UpdateBind_Internal(Graphics& gfx, const Transforms& tf) 
 
 TransformCBuffer::Transforms TransformCBuffer::GetTransforms(Graphics& gfx) noexcept
 {
-    const auto modelView = m_Parent.GetTransformMatrix() * gfx.GetCameraTransform();
-    return { DirectX::XMMatrixTranspose(m_Parent.GetTransformMatrix()), DirectX::XMMatrixTranspose(modelView), DirectX::XMMatrixTranspose(modelView * gfx.GetProjection()) };
+    const auto M = m_Parent.GetTransformMatrix();
+    const auto V = gfx.GetCameraTransform();
+    const auto P = gfx.GetProjection();
+
+    const auto modelViewProj = (P * V * M);
+    const auto modelView = (V * M);
+
+    // transpose before sending off to HLSL
+	return { M, modelView, modelViewProj};
 }

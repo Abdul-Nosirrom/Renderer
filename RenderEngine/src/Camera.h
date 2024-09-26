@@ -1,18 +1,19 @@
 #pragma once
 
-#include <DirectXMath.h>
+#include "Math/Math.h"
 #include <queue>
 
 // temp basic camera class
 class Camera
 {
+	friend class Graphics;
 public:
 	static Camera& Get() { return s_Camera; }
 
 private:
 	Camera() noexcept
 	{
-		m_Pos = DirectX::XMVECTOR({ 0, 0, -5.f, 1 });
+		m_Pos = Vector3( 0, 0, -5.f );
 		m_Yaw = 0.f;
 		m_Pitch = 0.f;
 		m_Keyboard = nullptr;
@@ -33,12 +34,12 @@ public:
 
 	void SetIO(class Keyboard* keyboard, class Mouse* mouse) noexcept;
 
-	DirectX::XMMATRIX GetTransform() { return m_CameraTransform;  }
+	Matrix4x4 GetTransform() { return m_CameraTransform;  }
 
 private:
-	DirectX::XMMATRIX m_CameraTransform;
+	Matrix4x4 m_CameraTransform;
 
-	DirectX::XMVECTOR m_Pos;
+	Vector3 m_Pos;
 	float m_Pitch, m_Yaw;
 	bool bMouseInWindow;
 	std::pair<int, int> mousePosDelta;

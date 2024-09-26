@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include <DirectXMath.h>
+#include "Math.h"
 
 #include "IBindable.h"
 #include <memory>
@@ -12,27 +12,27 @@ namespace RenderResource
 	public:
 		Vertex() noexcept = default;
 
-		void SetPosition(DirectX::XMFLOAT3 InPos) noexcept
+		void SetPosition(Vector3 InPos) noexcept
 		{
 			Position = InPos;
 		}
-		void SetUV(DirectX::XMFLOAT2 InUV) noexcept
+		void SetUV(Vector2 InUV) noexcept
 		{
 			UV = InUV;
 		}
-		void SetNormal(DirectX::XMFLOAT3 InNormal) noexcept
+		void SetNormal(Vector3 InNormal) noexcept
 		{
 			Normal = InNormal;
 		}
-		void SetColor(DirectX::XMFLOAT3 InColor) noexcept
+		void SetColor(Vector3 InColor) noexcept
 		{
 			Color = InColor;
 		}
 	protected:
-        DirectX::XMFLOAT3 Position = { 0,0,0 };
-        DirectX::XMFLOAT2 UV = { 0,0 };
-        DirectX::XMFLOAT3 Normal = { 0,0,0 };
-        DirectX::XMFLOAT3 Color = { 0,0,0 };
+        Vector3 Position = { 0,0,0 };
+        Vector2 UV = { 0,0 };
+        Vector3 Normal = { 0,0,0 };
+        Vector3 Color = { 0,0,0 };
     };
 
     struct VertexFactory
@@ -42,15 +42,15 @@ namespace RenderResource
         
         void AddVertex(const Vertex& InVertex) noexcept { m_VertexData.push_back(InVertex); }
 
-        void AddVertex(DirectX::XMFLOAT3 Pos) noexcept
+        void AddVertex(Vector3 Pos) noexcept
         { Vertex Vert; Vert.SetPosition(Pos); AddVertex(Vert); };
-        void AddVertex(DirectX::XMFLOAT3 Pos, DirectX::XMFLOAT2 UV) noexcept
+        void AddVertex(Vector3 Pos, Vector2 UV) noexcept
         { Vertex Vert; Vert.SetPosition(Pos); Vert.SetUV(UV), AddVertex(Vert); };
-        void AddVertex(DirectX::XMFLOAT3 Pos, DirectX::XMFLOAT3 Color) noexcept
+        void AddVertex(Vector3 Pos, Vector3 Color) noexcept
         { Vertex Vert; Vert.SetPosition(Pos); Vert.SetColor(Color), AddVertex(Vert); };
-        void AddVertex(DirectX::XMFLOAT3 Pos, DirectX::XMFLOAT3 Normal, DirectX::XMFLOAT2 UV) noexcept
+        void AddVertex(Vector3 Pos, Vector3 Normal, Vector2 UV) noexcept
         { Vertex Vert; Vert.SetPosition(Pos); Vert.SetNormal(Normal); Vert.SetUV(UV); AddVertex(Vert); };
-        void AddVertex(DirectX::XMFLOAT3 Pos, DirectX::XMFLOAT3 Normal, DirectX::XMFLOAT2 UV, DirectX::XMFLOAT3 Color) noexcept
+        void AddVertex(Vector3 Pos, Vector3 Normal, Vector2 UV, Vector3 Color) noexcept
         { Vertex Vert; Vert.SetPosition(Pos); Vert.SetNormal(Normal); Vert.SetUV(UV); Vert.SetColor(Color); AddVertex(Vert); };
        
         const void* Data() const { return m_VertexData.data(); }

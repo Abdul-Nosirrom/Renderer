@@ -1,8 +1,7 @@
 ﻿#pragma once
-#include <DirectXMath.h>
 #include <memory>
 #include <vector>
-
+#include "Math.h"
 #include "Graphics/Graphics.h"
 
 // Forward declarations
@@ -25,7 +24,7 @@ public:
 
     virtual void Update(Graphics& gfx, float DeltaTime) {};
 
-    virtual DirectX::XMMATRIX GetTransformMatrix() const noexcept = 0;
+    virtual Matrix4x4 GetTransformMatrix() const noexcept = 0;
 
 protected:
     template<class T>

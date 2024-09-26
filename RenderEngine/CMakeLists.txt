@@ -1,14 +1,11 @@
 ################################################
-############# RENDERER DLL PROJECT #############
+############# RENDERER DLL #####################
 ################################################
-
-cmake_minimum_required(VERSION 3.20)
-
-set(CMAKE_CXX_STANDARD 20)
 
 project(RenderEngine)
 message("------------------START OF TEST RENDER ENGINE CMAKELIST------------------")
 
+add_subdirectory(external)
 
 # Headers and pahts
 set(CPP_INCLUDE_DIRS "")
@@ -21,16 +18,21 @@ file(GLOB_RECURSE CPP_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h" "${CMAK
 
 # Setup include directories
 list(APPEND CPP_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/../include/imgui/")
+#list(APPEND CPP_INCLUDE_DIRS "${Eigen_INCLUDE_DIRS}")
+list(APPEND CPP_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/external/eigen")
 list(APPEND CPP_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/src/")
 
 # Includ directory
 include_directories(${CPP_INCLUDE_DIRS}) 
 
 # Executable
-add_library(${PROJECT_NAME} SHARED
+add_library(${PROJECT_NAME} SHARED 
 	${CPP_HEADER_FILES} 
 	${CPP_SOURCE_FILES}
 )
+
+target_link_libraries(${PROJECT_NAME} INTERFACE eigen)
+
 
 # Add preprocessor definitions based on configuration/build type
 add_compile_definitions("-DBUILD_DLL $<$<CONFIG:Debug>:-D_Debug>")

@@ -26,11 +26,11 @@ void PrimitiveDrawable::InitMesh(Graphics& gfx, PrimitiveMesh::EType MeshType)
 	AddBindable(IndexBuffer::Resolve(gfx, geoTag, idxData));
 
 	// Shaders
-	auto pVS = VertexShader::Resolve(gfx, "shaders/Shaders.hlsl");
+	auto pVS = VertexShader::Resolve(gfx, "./../../../shaders/Shaders.hlsl");
 	auto pVSByteCode = pVS->GetBytecode(); // Retrieve to feed input input layout
 	AddBindable(std::move(pVS));
 
-	AddBindable(PixelShader::Resolve(gfx, "shaders/Shaders.hlsl"));
+	AddBindable(PixelShader::Resolve(gfx, "./../../../shaders/Shaders.hlsl"));
 
 	// Time constant buffer
 	AddBindable(PixelConstantBuffer<TimeCBufData>::Resolve(gfx, 1));
@@ -64,15 +64,17 @@ void PrimitiveDrawable::InitMesh(Graphics& gfx, PrimitiveMesh::EType MeshType)
 	SetRot({ (float)rotDist(rng), (float)rotDist(rng), (float)rotDist(rng) });
 
 	m_RotVelocity = { (float)rotvelDist(rng)*0.f, (float)rotvelDist(rng) - 2.5f, (float)rotvelDist(rng)*0.f };*/
-
+	m_Pos = { 0.f, 0.f, 5.f };
+	m_RotVelocity = { 0.f, 90.f, 0.f };
 }
 
 
-DirectX::XMMATRIX PrimitiveDrawable::GetTransformMatrix() const noexcept
+Matrix4x4 PrimitiveDrawable::GetTransformMatrix() const noexcept
 {
 	const float accumTime = timeAccum.timedata[0];
-	DirectX::XMFLOAT3 WorldRot = { m_RotVelocity.x * accumTime, m_RotVelocity.y * accumTime, m_RotVelocity.z * accumTime };
-	return DirectX::XMMatrixRotationRollPitchYaw(m_Rot.x, m_Rot.y, m_Rot.z) * DirectX::XMMatrixTranslation(m_Pos.x, m_Pos.y, m_Pos.z) * DirectX::XMMatrixRotationRollPitchYaw(WorldRot.x, WorldRot.y, WorldRot.z);
+	Vector3 WorldRot(m_RotVelocity * accumTime);
+	auto Transform = MatrixConstruction::Homogenize(MatrixConstruction::RotationMatrix(WorldRot)) * MatrixConstruction::TransformationMatrix(m_Pos, m_Rot, Vector3::Ones());
+	return Transform;
 }
 
 void PrimitiveDrawable::Update(Graphics& gfx, float DeltaTime)

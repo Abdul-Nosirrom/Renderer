@@ -4,7 +4,7 @@
 #include "RomanceWin.h" // Include first for all our switch cases since d3d11 also includes Windows.h
 #include "Errors/DXGIInfoManager.h"
 #include <d3d11.h>
-#include <DirectXMath.h>
+#include "Math/Math.h"
 #include <wrl.h>
 
 // Forward Declaration
@@ -34,8 +34,8 @@ public:
 	/// @brief	Presents the back buffer to the front buffer which is the screen (SwapBuffer)
 	void EndFrame();
 
-	DirectX::XMMATRIX GetCameraTransform() const noexcept;
-	DirectX::XMMATRIX GetProjection() const noexcept;
+	Matrix4x4 GetCameraTransform() const noexcept;
+	Matrix4x4 GetProjection() const noexcept;
 
 	void DrawIndexed(UINT indexCount);
 	

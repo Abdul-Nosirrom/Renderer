@@ -234,7 +234,7 @@ void PrimitiveMesh::MakeSphere(UINT phiSlices, UINT thetaSlices)
 	for (UINT Iphi = 0; Iphi < phiSlices; Iphi++)
 	{
 		const float phiPercent = Iphi * 1.f / (phiSlices - 1.f);
-		const float phi = phiPercent * DirectX::XM_PI;
+		const float phi = phiPercent * PI;
 
 		const float cosPhi = cos(phi);
 		const float sinPhi = sin(phi);
@@ -242,7 +242,7 @@ void PrimitiveMesh::MakeSphere(UINT phiSlices, UINT thetaSlices)
 		for (UINT Itheta = 0; Itheta < thetaSlices; Itheta++)
 		{
 			const float thetaPercent = Itheta * 1.f / (thetaSlices - 1.f);
-			const float theta = Itheta * DirectX::XM_2PI / thetaSlices;
+			const float theta = Itheta * 2 * PI / thetaSlices;
 
 			const float cosTheta = cos(theta);
 			const float sinTheta = sin(theta);
@@ -298,7 +298,7 @@ void PrimitiveMesh::MakeCylinder(UINT radialSlices, float height)
 		for (UINT Itheta = 0; Itheta < radialSlices; Itheta++)
 		{
 			const float thetaPercent = Itheta * 1.f / (radialSlices - 1.f);
-			const float theta = DirectX::XM_2PI * thetaPercent;
+			const float theta = 2 * PI * thetaPercent;
 
 			const float Z = cos(theta);
 			const float X = sin(theta);
@@ -336,7 +336,7 @@ void PrimitiveMesh::MakeCylinder(UINT radialSlices, float height)
 		for (UINT Itheta = 0; Itheta < radialSlices; Itheta++)
 		{
 			const float thetaPercent = Itheta * 1.f / (radialSlices - 1.f);
-			const float theta = DirectX::XM_2PI * thetaPercent;
+			const float theta = 2 * PI * thetaPercent;
 
 			const float Z = cos(theta);
 			const float X = sin(theta);

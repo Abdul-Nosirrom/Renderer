@@ -6,7 +6,13 @@ public:
 
 	TestApplication()
 	{
-		Drawables.push_back(std::make_unique<PrimitiveDrawable>(m_Window.GFX(), PrimitiveMesh::EType::Plane));
+		Vector3 pos(-12.f, 0.f, 0.f);
+		for (int i = 0; i < 25; i++)
+		{
+			Drawables.push_back(std::make_unique<PrimitiveDrawable>(m_Window.GFX(), PrimitiveMesh::EType::Cube));
+			Drawables[i].get()->SetPos(pos);
+			pos += Vector3(3.f, 0.f, 0.f);
+		}
 		float ClearColor[4] = { 0.15f, 0.f, 0.f, 1.f };
 		m_Window.GFX().SetClearColor(ClearColor);
 	}
