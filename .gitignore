@@ -69,6 +69,9 @@ ScaffoldingReadMe.txt
 # StyleCop
 StyleCopReport.xml
 
+# CLion cmake folders
+cmake-*/**
+
 # Files built by Visual Studio
 *_i.c
 *_p.c

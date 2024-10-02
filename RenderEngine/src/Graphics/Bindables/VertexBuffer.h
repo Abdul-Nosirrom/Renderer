@@ -42,15 +42,15 @@ namespace RenderResource
         
         void AddVertex(const Vertex& InVertex) noexcept { m_VertexData.push_back(InVertex); }
 
-        void AddVertex(Vector3 Pos) noexcept
+        void AddVertex(const Vector3& Pos) noexcept
         { Vertex Vert; Vert.SetPosition(Pos); AddVertex(Vert); };
-        void AddVertex(Vector3 Pos, Vector2 UV) noexcept
+        void AddVertex(const Vector3& Pos, const Vector2& UV) noexcept
         { Vertex Vert; Vert.SetPosition(Pos); Vert.SetUV(UV), AddVertex(Vert); };
-        void AddVertex(Vector3 Pos, Vector3 Color) noexcept
+        void AddVertex(const Vector3& Pos, const Vector3& Color) noexcept
         { Vertex Vert; Vert.SetPosition(Pos); Vert.SetColor(Color), AddVertex(Vert); };
-        void AddVertex(Vector3 Pos, Vector3 Normal, Vector2 UV) noexcept
+        void AddVertex(const Vector3& Pos, const Vector3& Normal, const Vector2& UV) noexcept
         { Vertex Vert; Vert.SetPosition(Pos); Vert.SetNormal(Normal); Vert.SetUV(UV); AddVertex(Vert); };
-        void AddVertex(Vector3 Pos, Vector3 Normal, Vector2 UV, Vector3 Color) noexcept
+        void AddVertex(const Vector3& Pos, const Vector3& Normal, const Vector2& UV, const Vector3& Color) noexcept
         { Vertex Vert; Vert.SetPosition(Pos); Vert.SetNormal(Normal); Vert.SetUV(UV); Vert.SetColor(Color); AddVertex(Vert); };
        
         const void* Data() const { return m_VertexData.data(); }

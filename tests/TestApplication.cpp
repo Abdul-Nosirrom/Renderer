@@ -1,5 +1,7 @@
 #include <RenderEngine.h>
 
+#include "Scene/Scene.h"
+
 class TestApplication : public RenderEngine::Application
 {
 public:
@@ -7,14 +9,9 @@ public:
 	TestApplication()
 	{
 		Vector3 pos(0.f, 0.f, 0.f);
-		for (int i = 0; i < 1; i++)
-		{
-			Drawables.push_back(std::make_unique<ModelDrawable>(m_Window.GFX(), "resources/max-planck.obj"));
-			Drawables[i].get()->SetPos(pos);
-			pos += Vector3(10.f, 0.f, 0.f);
-		}
-		float ClearColor[4] = { 0.15f, 0.f, 0.f, 1.f };
-		m_Window.GFX().SetClearColor(ClearColor);
+
+		m_Window.GFX().SetClearColor(Vector4(0.15f, 0.f, 0.f, 1.f));
+		Scene::Get()->LoadScene(m_Window.GFX(), "resources/sponza.obj");
 	}
 
 	virtual int Run() override

@@ -12,7 +12,7 @@
 	#define GFX_EXCEPT(hr) GFXException(__LINE__, __FILE__, hr, m_InfoManager.GetMessages())
 	#define GFX_THROW_INFO(hrcall) m_InfoManager.Set(); if (HRESULT hr1 = hrcall; FAILED(hr1)) throw GFX_EXCEPT(hr1)
 	#define GFX_THROW_INFO_ONLY(call) m_InfoManager.Set(); (call); {auto v = m_InfoManager.GetMessages(); if (!v.empty()) { throw GFXInfoException(__LINE__, __FILE__, v); } }
-	#define GFX_DEVICE_REMOVED_EXCEPT(hrcall) if (HRESULT hr2 = hrcall; FAILED(hr2)) { if (hr2 == DXGI_ERROR_DEVICE_REMOVED) throw GFXDeviceRemovedException(__LINE__, __FILE__, pDevice->GetDeviceRemovedReason(), m_InfoManager.GetMessages()); else GFX_EXCEPT(hr2); }
+	#define GFX_DEVICE_REMOVED_EXCEPT(hrcall) if (HRESULT hr2 = hrcall; FAILED(hr2)) { if (hr2 == DXGI_ERROR_DEVICE_REMOVED) throw GFXDeviceRemovedException(__LINE__, __FILE__, pDevice->GetDeviceRemovedReason(), m_InfoManager.GetMessages()); else throw GFX_EXCEPT(hr2); }
 #else 
 	#define GFX_EXCEPT(hr) GFX_EXCEPT_NOINFO(hr)
 	#define GFX_THROW_INFO(hrcall) GFX_THROW_NOINFO(hrcall)

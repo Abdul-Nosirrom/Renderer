@@ -27,7 +27,7 @@ list(APPEND CPP_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/src/")
 include_directories(${CPP_INCLUDE_DIRS}) 
 
 # Executable
-add_library(${PROJECT_NAME} SHARED 
+add_library(${PROJECT_NAME} SHARED
 	${CPP_HEADER_FILES} 
 	${CPP_SOURCE_FILES}
 )

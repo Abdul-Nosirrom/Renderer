@@ -11,7 +11,6 @@ set(CMAKE_CXX_STANDARD 20)
 
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE) #link time optimization
 
-
 project(RendererProject)
 message("------------------START OF RENDERER CMAKELIST------------------")
 #set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)

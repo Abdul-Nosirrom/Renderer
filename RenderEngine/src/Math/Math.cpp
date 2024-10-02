@@ -27,9 +27,7 @@ Matrix4x4 MatrixConstruction::ViewTransform(const Vector3& _Pos, const Vector3& 
 
 Matrix4x4 MatrixConstruction::PerspectiveMatrix(float fovX, float aspectRatio, float zNear, float zFar)
 {
-	float tanFOV = tan(DEG_TO_RAD(fovX / 2.f));
-	float right = zNear * tanFOV;
-	float top = right / aspectRatio;
+	const float tanFOV = tan(DEG_TO_RAD(fovX / 2.f));
 
 	Matrix4x4 projMatrix;
 	projMatrix <<	1 / tanFOV,	0.f,						0.f,				0.f,

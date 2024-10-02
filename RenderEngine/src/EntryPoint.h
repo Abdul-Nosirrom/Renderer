@@ -1,6 +1,6 @@
-#include "RomanceWin.h"
+#pragma once
 #include "Errors/RomanceException.h"
-#include "TestApp.h"
+#include "Application.h"
 
 extern RenderEngine::Application* RenderEngine::CreateApplication();
 

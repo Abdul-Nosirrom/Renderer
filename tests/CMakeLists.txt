@@ -68,6 +68,7 @@ add_executable(${PROJECT_NAME}
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE RenderEngine)
+target_link_libraries(${PROJECT_NAME} PRIVATE assimp)
 
 
 # Copy dll to executable [https://stackoverflow.com/questions/10671916/how-to-copy-dll-files-into-the-same-folder-as-the-executable-using-cmake]

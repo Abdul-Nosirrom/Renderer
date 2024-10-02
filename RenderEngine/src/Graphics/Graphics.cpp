@@ -1,6 +1,6 @@
 #include "Graphics.h"
 #include "Errors/GraphicsExceptions.h"
-#include "Camera.h"
+#include "Scene/Camera.h"
 
 // namespace for our com ptrs
 namespace wrl = Microsoft::WRL;
@@ -131,7 +131,7 @@ void Graphics::StartFrame() noexcept
 #endif
 
 	// Clear the back buffer
-	pContext->ClearRenderTargetView(pRenderTarget.Get(), m_ClearColor);
+	pContext->ClearRenderTargetView(pRenderTarget.Get(), m_ClearColor.data());
 	// Clear depth buffer
 	pContext->ClearDepthStencilView(pDSView.Get(), D3D11_CLEAR_DEPTH, 1.f, 0u);
 }
@@ -162,13 +162,13 @@ void Graphics::DrawIndexed(UINT indexCount)
 	{
 		wrl::ComPtr<ID3D11RasterizerState> pRSS;
 		D3D11_RASTERIZER_DESC rsd = {};
-		rsd.FillMode = D3D11_FILL_WIREFRAME;// | D3D11_FILL_SOLID;
-		rsd.CullMode = D3D11_CULL_BACK;
+		rsd.FillMode = D3D11_FILL_SOLID;
+		rsd.CullMode = D3D11_CULL_NONE;//D3D11_CULL_BACK;
 		
 		rsd.FrontCounterClockwise = FALSE;
 
 		GFX_THROW_INFO(pDevice->CreateRasterizerState(&rsd, &pRSS));
-		//pContext->RSSetState(pRSS.Get());
+		pContext->RSSetState(pRSS.Get());
 	}
 	GFX_THROW_INFO_ONLY(pContext->DrawIndexed(indexCount, 0u, 0u));
 }

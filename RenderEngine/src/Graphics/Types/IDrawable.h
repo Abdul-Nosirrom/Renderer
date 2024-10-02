@@ -24,7 +24,7 @@ public:
 
     virtual void Update(Graphics& gfx, float DeltaTime) {};
 
-    virtual Matrix4x4 GetTransformMatrix() const noexcept = 0;
+    virtual const Matrix4x4& GetTransformMatrix() const noexcept = 0;
 
 protected:
     template<class T>
