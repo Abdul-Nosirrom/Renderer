@@ -3,48 +3,31 @@
 #include "Math/Math.h"
 #include <queue>
 
+#include "EntityNode.h"
+
 // temp basic camera class
-class Camera
+class RENDERENGINE_API Camera : public EntityNode
 {
-	friend class Graphics;
-public:
-	static Camera& Get() { return s_Camera; }
-
-private:
-	Camera() noexcept
-	{
-		m_Pos = Vector3( 0, 0, -5.f );
-		m_Yaw = 0.f;
-		m_Pitch = 0.f;
-		m_Keyboard = nullptr;
-		m_Mouse = nullptr;
-		bMouseInWindow = false;
-	}
-	~Camera() = default;
-	
-	Camera(const Camera&) = delete;
-	Camera& operator=(const Camera&) = delete;
-
-	// singleton
-	static Camera s_Camera;
-
+	friend class Editor_Scene;
 public:
 
 	void Update(float dT);
 
-	void SetIO(class Keyboard* keyboard, class Mouse* mouse) noexcept;
+	const Matrix4x4& GetViewMatrix() const noexcept;
 
-	Matrix4x4 GetTransform() { return m_CameraTransform;  }
+	void SetActive(bool bVal) noexcept { bActive = bVal;}
+	bool IsActive() const noexcept { return bActive; }
+
+	void SetFoV(float val) { FoV = val; }
+	float GetFoV() const { return FoV; }
 
 private:
-	Matrix4x4 m_CameraTransform;
 
-	Vector3 m_Pos;
-	float m_Pitch, m_Yaw;
-	bool bMouseInWindow;
+	Matrix4x4 m_ViewMatrix;
+
+	bool bActive = false;
+	bool bMouseInWindow = false;
+	float FoV = 90.f;
 	std::pair<int, int> mousePosDelta;
-
-	Keyboard* m_Keyboard;
-	Mouse* m_Mouse;
 };
 

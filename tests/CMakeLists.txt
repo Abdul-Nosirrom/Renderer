@@ -49,14 +49,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 #file(GLOB_RECURSE CPP_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/imgui/*.h")
 
 # Add our project files
-file(GLOB_RECURSE CPP_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/../include/imgui/*.cpp")
-file(GLOB_RECURSE CPP_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/../include/imgui/*.h")
+file(GLOB_RECURSE CPP_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")# "${CMAKE_CURRENT_SOURCE_DIR}/../RenderEngine/external/imgui/*.cpp")
+file(GLOB_RECURSE CPP_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.h")# "${CMAKE_CURRENT_SOURCE_DIR}/../RenderEngine/external/imgui/*.h")
 
 # Setup include directories
 #list(APPEND CPP_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include/imgui/")
 list(APPEND CPP_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/")
 list(APPEND CPP_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/../RenderEngine/src/")
-list(APPEND CPP_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/../include/imgui/")
+list(APPEND CPP_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/../RenderEngine/external/imgui/")
 
 # Includ directory
 include_directories(${CPP_INCLUDE_DIRS}) 

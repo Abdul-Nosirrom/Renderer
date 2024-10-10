@@ -1,6 +1,7 @@
 #include "Graphics.h"
 #include "Errors/GraphicsExceptions.h"
 #include "Scene/Camera.h"
+#include "Scene/Scene.h"
 
 // namespace for our com ptrs
 namespace wrl = Microsoft::WRL;
@@ -147,13 +148,13 @@ void Graphics::EndFrame()
 
 Matrix4x4 Graphics::GetCameraTransform() const noexcept
 {
-	return Camera::Get().GetTransform();
+	return Scene::Get().GetViewMatrix();
 }
 
 
 Matrix4x4 Graphics::GetProjection() const noexcept
 {
-	return MatrixConstruction::PerspectiveMatrix(90.f, 1.f, 0.5f, 100.f); // aspect ratio, znear, zfar
+	return MatrixConstruction::PerspectiveMatrix(Scene::Get().GetViewFoV(), 1.f, 0.5f, 100.f); // aspect ratio, znear, zfar
 }
 
 void Graphics::DrawIndexed(UINT indexCount)
@@ -162,7 +163,7 @@ void Graphics::DrawIndexed(UINT indexCount)
 	{
 		wrl::ComPtr<ID3D11RasterizerState> pRSS;
 		D3D11_RASTERIZER_DESC rsd = {};
-		rsd.FillMode = D3D11_FILL_SOLID;
+		rsd.FillMode = D3D11_FILL_WIREFRAME;
 		rsd.CullMode = D3D11_CULL_NONE;//D3D11_CULL_BACK;
 		
 		rsd.FrontCounterClockwise = FALSE;

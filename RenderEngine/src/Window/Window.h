@@ -55,10 +55,6 @@ private:
 	/// @brief  Member function that is piped with window messages
 	LRESULT HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 
-public:
-	Mouse mouse;
-	Keyboard kbd;
-
 private:
 	int m_Width, m_Height;
 	HWND m_hWnd;

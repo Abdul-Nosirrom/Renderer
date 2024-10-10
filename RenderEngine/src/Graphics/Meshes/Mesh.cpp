@@ -1,5 +1,6 @@
 ﻿#include "Mesh.h"
 
+#include <format>
 #include <iostream>
 #include <assimp/scene.h>           // Output data structure
 
@@ -9,8 +10,7 @@ using namespace RenderResource;
 
 Mesh::Mesh(const aiMesh* mesh)
 {
-	//m_GeometryTag; // we still end up regenerating the vertices...
-	m_GeometryTag = mesh->mName.C_Str();
+	m_GeometryTag = mesh->mName.C_Str() ? mesh->mName.C_Str() : "ERROR";
 
 	unsigned int numVerts = mesh->mNumVertices;
 

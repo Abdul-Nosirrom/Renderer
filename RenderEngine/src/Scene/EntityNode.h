@@ -11,12 +11,14 @@
 class RENDERENGINE_API EntityNode : public IDrawable
 {
 	friend class Scene;
+	friend class Editor_Scene;
 
 public:
 	void AddChild(const std::shared_ptr<EntityNode> &child);
 	virtual void OnRender(Graphics& gfx) const {}
 
 	const Matrix4x4& GetTransformMatrix() const noexcept override;
+	virtual const std::string& GetName() const { return ""; }
 
 protected:
 	void SetParent(EntityNode* parent);

@@ -3,6 +3,8 @@
 //
 
 #include "Scene.h"
+
+#include "Camera.h"
 #include "MeshEntity.h"
 
 Matrix4x4 ConvertAssimpMatrix(const aiMatrix4x4& m)
@@ -14,6 +16,22 @@ Matrix4x4 ConvertAssimpMatrix(const aiMatrix4x4& m)
 				m.d1, m.d2, m.d3, m.d4;
 
 	return result;
+}
+
+Scene& Scene::Get()
+{
+	static Scene instance;
+	return instance;
+}
+
+const Matrix4x4 & Scene::GetViewMatrix() const
+{
+	return m_activeCamera->GetViewMatrix();
+}
+
+float Scene::GetViewFoV() const
+{
+	return m_activeCamera->GetFoV();
 }
 
 void Scene::LoadScene(Graphics& gfx, const std::string& filePath)
@@ -69,6 +87,22 @@ void Scene::RegisterNode(Graphics& gfx, EntityNode* pParent, const aiScene* pSce
 
 }
 
+
+void Scene::SetActiveCamera(std::shared_ptr<Camera> camera)
+{
+	for (auto& cam : m_cameras)
+	{
+		cam->SetActive(false);
+	}
+
+	m_activeCamera = std::move(camera);
+	m_activeCamera->SetActive(true);
+}
+
+void Scene::Update(float DT)
+{
+	m_activeCamera->Update(DT);
+}
 
 void Scene::Render(Graphics& gfx)
 {

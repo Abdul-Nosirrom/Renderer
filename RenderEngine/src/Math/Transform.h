@@ -7,6 +7,7 @@
 
 class RENDERENGINE_API Transform
 {
+	friend class Editor_Scene;
 public:
 	Transform() : m_Position(Vector3(0,0,0)), m_Rotation(Vector3(0,0,0)), m_Scale(Vector3(1,1,1)) {}
 	Transform(const Vector3& inPos, const Vector3& inRot, const Vector3& inScale) : m_Position(inPos), m_Rotation(inRot), m_Scale(inScale) {}
@@ -49,5 +50,6 @@ private:
 	Matrix4x4 m_Transform;
 };
 
-
+#if BUILD_DLL
 inline Transform Transform::Identity = Transform();
+#endif

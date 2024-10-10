@@ -5,6 +5,7 @@
 #include "Scene/Camera.h"
 #include <iostream>
 
+#include "Editor/Editor.h"
 #include "Scene/Scene.h"
 //#include "ImGuiContext.h"
 
@@ -33,8 +34,6 @@ RenderEngine::Application::Application()
 	Vector3 Trans(2.f, 3.f, 4.f);
 	Vector3 Forward(1.f, 0.f, 0.f);
 	Vector3 Up(0.f, 1.f, 0.f);
-
-	//std::cout << MatrixConstruction::LookAtTransform(Trans, -Forward, Up) << std::endl;
 }
 
 int RenderEngine::Application::Run()
@@ -45,13 +44,12 @@ int RenderEngine::Application::Run()
 void RenderEngine::Application::RunFrame()
 {
 	const float dt = m_Timer.Mark();
-	Camera::Get().Update(dt);
-
+	Scene::Get().Update(dt);
 
 	m_Window.GFX().StartFrame();
 
-	Scene::Get()->Render(m_Window.GFX());
+	Scene::Get().Render(m_Window.GFX());
+	Editor::Get().OnRender(dt);
 
-	//ImGuiManager::EndFrame();
 	m_Window.GFX().EndFrame();
 }

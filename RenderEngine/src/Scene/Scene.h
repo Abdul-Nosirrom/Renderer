@@ -10,6 +10,8 @@
 #include <assimp/scene.h>           // Output data structure
 #include <assimp/postprocess.h>     // Post processing flags
 
+#include "Math/Math.h"
+
 class EntityNode;
 class Graphics;
 class Camera;
@@ -18,14 +20,10 @@ class Camera;
 
 class RENDERENGINE_API Scene
 {
-public:
-    static Scene* Get()
-  	{
-      if (!s_instance) s_instance = new Scene();
-      return s_instance;
-    }
+    friend class Editor_Scene;
 
-    static void Destroy() { delete s_instance; }
+public:
+    static Scene& Get();
 
     void LoadScene(Graphics& gfx, const std::string &filePath);
 
@@ -34,16 +32,27 @@ public:
         m_entities.push_back(std::move(node));
     }
 
+    void AddCamera(std::shared_ptr<Camera> camera)
+    {
+        if (m_cameras.empty()) m_activeCamera = camera;
+        m_cameras.push_back(std::move(camera));
+    }
+
+    void SetActiveCamera(std::shared_ptr<Camera> camera);
+
+    void Update(float DT);
     void Render(Graphics& gfx);
+
+    const Matrix4x4& GetViewMatrix() const;
+    float GetViewFoV() const;
 
 private:
     void RegisterNode(Graphics& gfx, EntityNode* pParent, const aiScene* pScene, const aiNode* pNode);
 
-    inline static Scene* s_instance = nullptr;
-
     std::vector<std::shared_ptr<EntityNode>> m_entities;
     //std::vector<std::shared_ptr<Light>> m_lights;
-    std::shared_ptr<Camera> m_camera;
+    std::vector<std::shared_ptr<Camera>> m_cameras;
+    std::shared_ptr<Camera> m_activeCamera;
 };
 
 

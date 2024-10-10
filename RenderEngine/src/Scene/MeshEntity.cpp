@@ -67,3 +67,8 @@ void MeshEntity::OnRender(Graphics &gfx) const
 		childNode->OnRender(gfx);
 	}
 }
+
+const std::string& MeshEntity::GetName() const
+{
+	return m_Mesh->m_GeometryTag;
+}

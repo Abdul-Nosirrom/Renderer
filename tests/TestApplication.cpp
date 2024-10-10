@@ -1,5 +1,4 @@
 #include <RenderEngine.h>
-
 #include "Scene/Scene.h"
 
 class TestApplication : public RenderEngine::Application
@@ -11,7 +10,9 @@ public:
 		Vector3 pos(0.f, 0.f, 0.f);
 
 		m_Window.GFX().SetClearColor(Vector4(0.15f, 0.f, 0.f, 1.f));
-		Scene::Get()->LoadScene(m_Window.GFX(), "resources/sponza.obj");
+		for (int i = 0; i < 4; i++)
+			Scene::Get().AddCamera(std::make_shared<Camera>());
+		Scene::Get().LoadScene(m_Window.GFX(), "resources/sponza.obj");
 	}
 
 	virtual int Run() override
@@ -25,7 +26,6 @@ public:
 				return *ecode;
 			}
 
-			//ImGuiManager::NewFrame();
 			RunFrame();
 		}
 	}

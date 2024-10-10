@@ -1,7 +1,11 @@
 #include "Window.h"
 #include <sstream>
+
+#include "imgui.h"
+#include "Editor/Editor.h"
 #include "Scene/Camera.h"
 #include "Errors/WindowExceptions.h"
+#include "IO/InputHandler.h"
 
 /************************************************************************/
 /* Window Class Internal                                                */
@@ -92,9 +96,9 @@ Window::Window(int width, int height, const char* name)
 
 	// Initialize DX11
 	pGFX = std::make_unique<Graphics>(m_hWnd);
-
-	// Initialize camera
-	Camera::Get().SetIO(&kbd, &mouse);
+	
+	// Initialize editor subsystem
+	Editor::Get().Initialize(m_hWnd, pGFX->pDevice.Get(), pGFX->pContext.Get());
 }
 
 Window::~Window()
@@ -182,6 +186,13 @@ LRESULT WINAPI Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 	//static WindowsMessageMap messageMap;
 	//OutputDebugString(messageMap(msg, lParam, wParam).c_str());
 
+	// ImGui might want to handle the IO event
+	{
+		extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+		if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
+			return true;
+	}
+
 	switch (msg)
 	{
 		// NOTE: We don't want DefProc to handle this because we want our destructor to destroy the window, so return 0
@@ -191,7 +202,7 @@ LRESULT WINAPI Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 
 		// NOTE: Clear up states on lose focus to avoid having "zombie keys" floating around
 	case WM_KILLFOCUS:
-		kbd.ClearState();
+		InputHandler::GetKeyboard().ClearState();
 		break;
 
 		// Resizing the window, invoke event on Graphics to adjust viewport
@@ -204,17 +215,17 @@ LRESULT WINAPI Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 	case WM_SYSKEYDOWN: // NOTE: syskey commands need to be handled to track ALT key and other system keys like F10 (VK_MENU)
 	case WM_KEYDOWN:
 		// [https://learn.microsoft.com/en-us/windows/win32/inputdev/wm-keydown] Bit 30 we wanna check for autorepeat sequences, its the "previous key state"
-		if (!(lParam & 0x40000000) || kbd.AutoRepeatIsEnabled())
+		if (!(lParam & 0x40000000) || InputHandler::GetKeyboard().AutoRepeatIsEnabled())
 		{
-			kbd.OnKeyPressed(static_cast<unsigned char>(wParam));
+			InputHandler::GetKeyboard().OnKeyPressed(static_cast<unsigned char>(wParam));
 		}
 		break;
 	case WM_SYSKEYUP:
 	case WM_KEYUP:
-		kbd.OnKeyReleased(static_cast<unsigned char>(wParam));
+		InputHandler::GetKeyboard().OnKeyReleased(static_cast<unsigned char>(wParam));
 		break;
 	case WM_CHAR:
-		kbd.OnChar(static_cast<unsigned char>(wParam));
+		InputHandler::GetKeyboard().OnChar(static_cast<unsigned char>(wParam));
 		break;
 		/***** END KEYBOARD MESSAGES *****/
 
@@ -227,27 +238,27 @@ LRESULT WINAPI Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		// In client region, log move and log enter + capture mouse (if previously out of region)
 		if (pt.x >= 0 && pt.x < m_Width && pt.y >= 0 && pt.y < m_Height)
 		{
-			mouse.OnMouseMove(pt.x, pt.y);
-			if (!mouse.IsInWindow())
+			InputHandler::GetMouse().OnMouseMove(pt.x, pt.y);
+			if (!InputHandler::GetMouse().IsInWindow())
 			{
 				// Win API to capture mouse, keep it captured even
 				SetCapture(m_hWnd);
-				mouse.OnMouseEnter();
+				InputHandler::GetMouse().OnMouseEnter();
 			}
 		}
 		// Not in client region, log move/ maintain capture iff button down
 		else
 		{
 			// if statement equivalent to [wParam & (MK_LBUTTON | MK_RBUTTON)]
-			if (mouse.LeftIsPressed() || mouse.RightIsPressed())
+			if (InputHandler::GetMouse().LeftIsPressed() || InputHandler::GetMouse().RightIsPressed())
 			{
-				mouse.OnMouseMove(pt.x, pt.y); // e.g this scope can happen when dragging the window for example
+				InputHandler::GetMouse().OnMouseMove(pt.x, pt.y); // e.g this scope can happen when dragging the window for example
 			}
 			// Button up, release capture / log event for leaving
 			else
 			{
 				ReleaseCapture();
-				mouse.OnMouseLeave();
+				InputHandler::GetMouse().OnMouseLeave();
 			}
 		}
 		break;
@@ -255,18 +266,18 @@ LRESULT WINAPI Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 	case WM_LBUTTONDOWN:
 	{
 		const POINTS pt = MAKEPOINTS(lParam);
-		mouse.OnLeftPressed(pt.x, pt.y);
+		InputHandler::GetMouse().OnLeftPressed(pt.x, pt.y);
 		break;
 	}
 	case WM_LBUTTONUP:
 	{
 		const POINTS pt = MAKEPOINTS(lParam);
-		mouse.OnLeftReleased(pt.x, pt.y);
+		InputHandler::GetMouse().OnLeftReleased(pt.x, pt.y);
 		// Release mouse if input released outside of client region
 		if (pt.x < 0 || pt.x >= m_Width || pt.y < 0 || pt.y >= m_Height)
 		{
 			ReleaseCapture();
-			mouse.OnMouseLeave();
+			InputHandler::GetMouse().OnMouseLeave();
 		}
 		break;
 	}
@@ -281,13 +292,13 @@ LRESULT WINAPI Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 			MapWindowPoints(hWnd, nullptr, reinterpret_cast<POINT*>(&rect), 2);
 			ClipCursor(&rect);
 		}
-		mouse.OnRightPressed(pt.x, pt.y);
+		InputHandler::GetMouse().OnRightPressed(pt.x, pt.y);
 		break;
 	}
 	case WM_RBUTTONUP:
 	{
 		const POINTS pt = MAKEPOINTS(lParam);
-		mouse.OnRightReleased(pt.x, pt.y);
+		InputHandler::GetMouse().OnRightReleased(pt.x, pt.y);
 		// Show cursor again and remove confinement
 		{
 			ShowCursor(TRUE);
@@ -297,7 +308,7 @@ LRESULT WINAPI Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		if (pt.x < 0 || pt.x >= m_Width || pt.y < 0 || pt.y >= m_Height)
 		{
 			ReleaseCapture();
-			mouse.OnMouseLeave();
+			InputHandler::GetMouse().OnMouseLeave();
 		}
 		break;
 	}
@@ -305,12 +316,12 @@ LRESULT WINAPI Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 	{
 		const POINTS pt = MAKEPOINTS(lParam);
 		const int delta = GET_WHEEL_DELTA_WPARAM(wParam);
-		mouse.OnWheelDelta(pt.x, pt.y, delta);
+		InputHandler::GetMouse().OnWheelDelta(pt.x, pt.y, delta);
 		break;
 	}
 	case WM_MOUSELEAVE: // Invalidate our mouse here
 	{
-		mouse.OnMouseLeave();
+		InputHandler::GetMouse().OnMouseLeave();
 		break;
 	}
 	/***** END MOUSE MESSAGES *****/
