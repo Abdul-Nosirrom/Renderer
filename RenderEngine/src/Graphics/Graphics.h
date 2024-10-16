@@ -32,14 +32,20 @@ public:
 	/// @brief	Presents the back buffer to the front buffer which is the screen (SwapBuffer)
 	void EndFrame();
 
-	Matrix4x4 GetCameraTransform() const noexcept;
 	Matrix4x4 GetProjection() const noexcept;
 
 	void DrawIndexed(UINT indexCount);
 	
 	void SetClearColor(const Vector4& Color) noexcept { m_ClearColor = Color; }
 
+	void ResizeWindow(const Vector2& NewSize);
+
 private:
+
+	void CreateRenderTargets();
+	void ReleaseRenderTargets();
+	void SetupViewport();
+
 	Vector4 m_ClearColor = Vector4(0,0,0,1);
 
 private:
@@ -50,6 +56,7 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDSView;
 
+	Vector2 ViewportSize;
 	
 #ifdef _DEBUG
 	DXGIInfoManager m_InfoManager;

@@ -13,6 +13,7 @@ namespace wrl = Microsoft::WRL;
 
 Graphics::Graphics(HWND hWnd)
 {
+	ViewportSize = {800, 800};
 	// Set up configuration struct for our swap chain
 	DXGI_SWAP_CHAIN_DESC sd = {};
 	sd.BufferDesc.Width = 0;                                                /* Buffer Width, 0 to default to window */
@@ -53,76 +54,8 @@ Graphics::Graphics(HWND hWnd)
 		&pContext                   /* Pointer to our device context, to be filled out upon creation */
 	));
 
-	// Gain access to texture subresource in swap chain (back buffer)
-	wrl::ComPtr<ID3D11Resource> pBackBuffer = nullptr;
-	// Similar to QueryInterface from COM in terms of inputs, except we're querying a resource on the interface
-	GFX_THROW_INFO(pSwapChain->GetBuffer(
-		0,                             /* Index of buffer we wanna get, 0 gives us the back buffer*/
-		UUID(ID3D11Resource),          /* UUID thing of COM interface, a D3D11 resource in our case */
-		(&pBackBuffer)                 /* PP to our resource to be filled out */
-	));
-
-	// Create a reference to the render target view to access and modify later. This is getting a reference to the back buffer, so we're drawing to that render target
-	// which is the back buffer, then upon swapping buffer presenting it (in which the front buffer now becomes the back buffer we draw to next frame)
-	GFX_THROW_INFO(pDevice->CreateRenderTargetView(
-		pBackBuffer.Get(),      /* Buffer in which to receive the render target from */
-		nullptr,                /* Config struct to specify how we wanna receive the RTV, default it */
-		&pRenderTarget          /* ID3D11 Target to be filled out */
-	));
-
-	// Setup our viewport
-	D3D11_VIEWPORT viewPort = {};
-	viewPort.Width = 800;
-	viewPort.Height = 800;
-	viewPort.MinDepth = 0;
-	viewPort.MaxDepth = 1;
-	viewPort.TopLeftX = 0;
-	viewPort.TopLeftY = 0;
-	pContext->RSSetViewports(1u, &viewPort);
-
-	//////////////////////////////////////////////////////////////////////////
-	// Create Depth Stencil State/View & Bind for 3D Rendering Depth Tests
-	//////////////////////////////////////////////////////////////////////////
-
-	// Define the state of the depth stencil obj, we're only enabling depth tests here not stencil tests and setting to to compare by 'less' op
-	// Essentially describing how our depth tests are gonna work
-	D3D11_DEPTH_STENCIL_DESC dssDesc = {};
-	dssDesc.DepthEnable = TRUE;
-	dssDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	dssDesc.DepthFunc = D3D11_COMPARISON_LESS;
-
-	wrl::ComPtr<ID3D11DepthStencilState> pDSState;
-
-	GFX_THROW_INFO(pDevice->CreateDepthStencilState(&dssDesc, &pDSState));
-
-	pContext->OMSetDepthStencilState(pDSState.Get(), 0u); // bind depth state to object merger
-
-	// Create depth texture, this is where depth results will go to
-	wrl::ComPtr<ID3D11Texture2D> pDSTexture;
-	D3D11_TEXTURE2D_DESC dstDesc = {};
-	dstDesc.Width = 800u;
-	dstDesc.Height = 800u;
-	dstDesc.MipLevels = 1u; // disable mips for depth texture
-	dstDesc.ArraySize = 1u; // not an array of textures
-	dstDesc.Format = DXGI_FORMAT_D32_FLOAT; // depth texture with no stencil is just D32
-	dstDesc.SampleDesc.Count = 1u; // no AA
-	dstDesc.SampleDesc.Quality = 0u;
-	dstDesc.Usage = D3D11_USAGE_DEFAULT;
-	dstDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL; // Important to specify this for this texture
-
-	GFX_THROW_INFO(pDevice->CreateTexture2D(&dstDesc, nullptr, &pDSTexture)); // No initial data because it'll be filled for us each frame
-
-	// In order to bind a texture to the pipeline, need to create a 'view' for that texture
-	D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
-	dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
-	dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-	dsvDesc.Texture2D.MipSlice = 0u;
-
-	GFX_THROW_INFO(pDevice->CreateDepthStencilView(pDSTexture.Get(), &dsvDesc, &pDSView));
-	
-
-	// Finally bind the depth stencil view to the object merger
-	pContext->OMSetRenderTargets(1u, pRenderTarget.GetAddressOf(), pDSView.Get());
+	CreateRenderTargets();
+	SetupViewport();
 }
 
 void Graphics::StartFrame() noexcept
@@ -146,15 +79,9 @@ void Graphics::EndFrame()
 
 }
 
-Matrix4x4 Graphics::GetCameraTransform() const noexcept
-{
-	return Scene::Get().GetViewMatrix();
-}
-
-
 Matrix4x4 Graphics::GetProjection() const noexcept
 {
-	return MatrixConstruction::PerspectiveMatrix(Scene::Get().GetViewFoV(), 1.f, 0.5f, 100.f); // aspect ratio, znear, zfar
+	return MatrixConstruction::PerspectiveMatrix(Scene::Get().GetViewFoV(), ViewportSize.y()/ViewportSize.x(), 0.5f, 100.f); // aspect ratio, znear, zfar
 }
 
 void Graphics::DrawIndexed(UINT indexCount)
@@ -172,4 +99,113 @@ void Graphics::DrawIndexed(UINT indexCount)
 		pContext->RSSetState(pRSS.Get());
 	}
 	GFX_THROW_INFO_ONLY(pContext->DrawIndexed(indexCount, 0u, 0u));
+}
+
+void Graphics::ResizeWindow(const Vector2 &NewSize)
+{
+	ViewportSize = NewSize;
+
+	if (pSwapChain)
+	{
+		ReleaseRenderTargets();
+
+		// Buffer Count & Format & Flags: By passing in 0 here & FORMAT_UNKNOWN, what that essentially does is preserve the old buffcount/format/flags upon creation
+		// 0s for size means use the rect size of the hwnd that was passed on initialize
+		GFX_THROW_INFO(pSwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0));
+
+		CreateRenderTargets();
+
+		SetupViewport();
+	}
+}
+
+void Graphics::CreateRenderTargets()
+{
+	// Gain access to texture subresource in swap chain (back buffer)
+	wrl::ComPtr<ID3D11Resource> pBackBuffer = nullptr;
+	// Similar to QueryInterface from COM in terms of inputs, except we're querying a resource on the interface
+	GFX_THROW_INFO(pSwapChain->GetBuffer(
+		0,                             /* Index of buffer we wanna get, 0 gives us the back buffer*/
+		UUID(ID3D11Resource),          /* UUID thing of COM interface, a D3D11 resource in our case */
+		(&pBackBuffer)                 /* PP to our resource to be filled out */
+	));
+
+	assert(pDevice.Get() && pContext.Get() && pBackBuffer.Get());
+	//assert(pContext.Get());
+
+	// Create a reference to the render target view to access and modify later. This is getting a reference to the back buffer, so we're drawing to that render target
+	// which is the back buffer, then upon swapping buffer presenting it (in which the front buffer now becomes the back buffer we draw to next frame)
+	GFX_THROW_INFO(pDevice->CreateRenderTargetView(
+		pBackBuffer.Get(),      /* Buffer in which to receive the render target from */
+		nullptr,                /* Config struct to specify how we wanna receive the RTV, default it */
+		&pRenderTarget          /* ID3D11 Target to be filled out */
+	));
+
+	//////////////////////////////////////////////////////////////////////////
+	// Create Depth Stencil State/View & Bind for 3D Rendering Depth Tests
+	//////////////////////////////////////////////////////////////////////////
+
+	// Define the state of the depth stencil obj, we're only enabling depth tests here not stencil tests and setting to to compare by 'less' op
+	// Essentially describing how our depth tests are gonna work
+	D3D11_DEPTH_STENCIL_DESC dssDesc = {};
+	dssDesc.DepthEnable = TRUE;
+	dssDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	dssDesc.DepthFunc = D3D11_COMPARISON_LESS;
+
+	wrl::ComPtr<ID3D11DepthStencilState> pDSState;
+
+	GFX_THROW_INFO(pDevice->CreateDepthStencilState(&dssDesc, &pDSState));
+
+	pContext->OMSetDepthStencilState(pDSState.Get(), 0u); // bind depth state to object merger
+
+	// Create depth texture, this is where depth results will go to
+	wrl::ComPtr<ID3D11Texture2D> pDSTexture;
+	D3D11_TEXTURE2D_DESC dstDesc = {};
+	dstDesc.Width = ViewportSize.x(); // Default to rect size
+	dstDesc.Height = ViewportSize.y();
+	dstDesc.MipLevels = 1u; // disable mips for depth texture
+	dstDesc.ArraySize = 1u; // not an array of textures
+	dstDesc.Format = DXGI_FORMAT_D32_FLOAT; // depth texture with no stencil is just D32
+	dstDesc.SampleDesc.Count = 1u; // no AA
+	dstDesc.SampleDesc.Quality = 0u;
+	dstDesc.Usage = D3D11_USAGE_DEFAULT;
+	dstDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL; // Important to specify this for this texture
+
+	GFX_THROW_INFO(pDevice->CreateTexture2D(&dstDesc, nullptr, &pDSTexture)); // No initial data because it'll be filled for us each frame
+
+	// In order to bind a texture to the pipeline, need to create a 'view' for that texture
+	D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
+	dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
+	dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	dsvDesc.Texture2D.MipSlice = 0u;
+
+	GFX_THROW_INFO(pDevice->CreateDepthStencilView(pDSTexture.Get(), &dsvDesc, &pDSView));
+
+
+	// Finally bind the depth stencil view to the object merger
+	pContext->OMSetRenderTargets(1u, pRenderTarget.GetAddressOf(), pDSView.Get());
+}
+
+void Graphics::ReleaseRenderTargets()
+{
+	// Unbind render target
+	pContext->OMSetRenderTargets(0, 0, 0);
+
+	// Release current render target & DSV, we'll create a new one with the correct dimensions
+	pRenderTarget = nullptr; // Calling release makes it crash idk why
+	pDSView = nullptr;
+
+}
+
+void Graphics::SetupViewport()
+{
+	// Setup our viewport
+	D3D11_VIEWPORT viewPort = {};
+	viewPort.Width = ViewportSize.x();
+	viewPort.Height = ViewportSize.y();
+	viewPort.MinDepth = 0;
+	viewPort.MaxDepth = 1;
+	viewPort.TopLeftX = 0;
+	viewPort.TopLeftY = 0;
+	pContext->RSSetViewports(1u, &viewPort);
 }

@@ -1,6 +1,7 @@
 ﻿#include "TransformCBuffer.h"
 
 #include "Graphics/Types/IDrawable.h"
+#include "Scene/Scene.h"
 
 using namespace RenderResource;
 
@@ -30,7 +31,7 @@ void TransformCBuffer::UpdateBind_Internal(Graphics& gfx, const Transforms& tf) 
 TransformCBuffer::Transforms TransformCBuffer::GetTransforms(Graphics& gfx) noexcept
 {
     const auto M = m_Parent.GetTransformMatrix();
-    const auto V = gfx.GetCameraTransform();
+    const auto V = Scene::Get().GetViewMatrix();
     const auto P = gfx.GetProjection();
 
     const auto modelViewProj = (P * V * M);

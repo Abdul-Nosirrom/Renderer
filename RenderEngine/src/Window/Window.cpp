@@ -207,7 +207,10 @@ LRESULT WINAPI Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 
 		// Resizing the window, invoke event on Graphics to adjust viewport
 	case WM_SIZE:
-		//HandleWindowResizing(wParam, lParam);
+		if (pGFX)
+		{
+			pGFX->ResizeWindow({LOWORD(lParam), HIWORD(lParam)});
+		}
 		break;
 		////////////////////////////////
 
