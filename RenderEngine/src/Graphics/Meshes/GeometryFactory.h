@@ -4,10 +4,7 @@
 #include <d3d11.h>
 #include <string>
 
-namespace RenderResource
-{
-	class VertexFactory;
-}
+struct VertexFactory;
 
 class GeometryFactory
 {
@@ -17,9 +14,9 @@ public:
 		Cube, Plane, Sphere, Cylinder
 	};
 
-	static const char* MakeCube(RenderResource::VertexFactory& vertices, std::vector<unsigned short>& indices);
-	static const char* MakePlane(RenderResource::VertexFactory& vertices, std::vector<unsigned short>& indices, UINT tesselation = 4);
-	static const char* MakeSphere(RenderResource::VertexFactory& vertices, std::vector<unsigned short>& indices, UINT phiSlices = 16, UINT thetaSlices = 16);
-	static const char* MakeCylinder(RenderResource::VertexFactory& vertices, std::vector<unsigned short>& indices, UINT radialSlices = 16, float height = 1.f);
+	static std::string MakeCube(VertexFactory& vertices);
+	static std::string MakePlane(VertexFactory& vertices, UINT tesselation = 2);
+	static std::string MakeSphere(VertexFactory& vertices, UINT phiSlices = 16, UINT thetaSlices = 16);
+	static std::string MakeCylinder(VertexFactory& vertices, UINT radialSlices = 16, float height = 1.f);
 };
 

@@ -1,10 +1,10 @@
 [submodule "RenderEngine/external/imgui"]
-	path = RenderEngine/external/imgui
+	path = external/imgui
 	url = https://github.com/ocornut/imgui.git
 	branch = docking
 [submodule "RenderEngine/external/eigen"]
-	path = RenderEngine/external/eigen
+	path = external/eigen
 	url = https://gitlab.com/libeigen/eigen
 [submodule "RenderEngine/external/assimp"]
-	path = RenderEngine/external/assimp
+	path = external/assimp
 	url = https://github.com/assimp/assimp

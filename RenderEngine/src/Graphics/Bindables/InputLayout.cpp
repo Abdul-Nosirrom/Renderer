@@ -1,5 +1,6 @@
 ﻿#include "InputLayout.h"
 
+#include "Primitives/Vertex.h"
 #include "Errors/GraphicsExceptions.h"
 #include "Graphics/RenderResourcePool.h"
 
@@ -9,8 +10,8 @@ InputLayout::InputLayout(Graphics& gfx, ID3DBlob* pVertexShaderBytecode)
 {
     INFOMAN(gfx);
     GFX_THROW_INFO(GetDevice(gfx)->CreateInputLayout(
-        m_LayoutDesc.data(),
-        UINT(m_LayoutDesc.size()),
+        VertexAttributes::InputLayout,
+        VertexAttributes::NumElements,
         pVertexShaderBytecode->GetBufferPointer(),
         pVertexShaderBytecode->GetBufferSize(),
         &pInputLayout));
@@ -28,12 +29,12 @@ std::shared_ptr<InputLayout> InputLayout::Resolve(Graphics& gfx, ID3DBlob* pVert
 
 std::string InputLayout::GenerateUID(ID3DBlob* pVertexShaderBytecode)
 {
-    const std::vector<D3D11_INPUT_ELEMENT_DESC> elemDesc = { InputElem::POSITION, InputElem::UV, InputElem::NORMAL, InputElem::COLOR };
+    //const std::vector<D3D11_INPUT_ELEMENT_DESC> elemDesc = { InputElem::POSITION, InputElem::UV, InputElem::NORMAL, InputElem::COLOR };
 
     using namespace std::string_literals;
     std::string layoutID;
     // layout description for all our needs rn would be semantic name + format, then combine all of them
-    for (auto elem : elemDesc)
+    for (const auto& elem : VertexAttributes::InputLayout)
     {
         const char* semanticName = elem.SemanticName;
         const DXGI_FORMAT inputFormat = elem.Format;

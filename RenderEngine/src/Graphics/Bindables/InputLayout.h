@@ -65,7 +65,7 @@ namespace RenderResource
         std::string GetUID() const noexcept override;
 
     protected:
-        std::vector<D3D11_INPUT_ELEMENT_DESC> m_LayoutDesc = { InputElem::POSITION, InputElem::UV, InputElem::NORMAL, InputElem::COLOR };
+        //std::vector<D3D11_INPUT_ELEMENT_DESC> m_LayoutDesc = { InputElem::POSITION, InputElem::UV, InputElem::NORMAL, InputElem::COLOR };
         Microsoft::WRL::ComPtr<ID3D11InputLayout> pInputLayout;
     };
     

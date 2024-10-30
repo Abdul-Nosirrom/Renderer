@@ -1,18 +1,21 @@
 ﻿#pragma once
 #include "IBindable.h"
+#include "Primitives/VertexFactory.h"
 #include <memory>
+
+//struct VertexFactory;
 
 namespace RenderResource
 {
     class IndexBuffer : public IBindable
     {
     public:
-        IndexBuffer(Graphics& gfx, const std::string& poolTag, const std::vector<unsigned short>& indices);
+        IndexBuffer(Graphics& gfx, const std::string& poolTag, const VertexFactory& indices);
 
         UINT GetCount() const noexcept { return m_Count; }
         void Bind(Graphics& gfx) noexcept override;
 
-        static std::shared_ptr<IndexBuffer> Resolve(Graphics& gfx, const std::string& poolTag, const std::vector<unsigned short>& indices);
+        static std::shared_ptr<IndexBuffer> Resolve(Graphics& gfx, const std::string& poolTag, const VertexFactory& indices);
 
         // NOTE: this is needed so the signature matches with Resolve but we don't wanna pass the rest into it
         template<typename...Ignore>

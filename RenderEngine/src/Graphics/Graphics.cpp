@@ -56,6 +56,9 @@ Graphics::Graphics(HWND hWnd)
 
 	CreateRenderTargets();
 	SetupViewport();
+
+	// Get the Annotations interface (Used for specifying named events with graphics command blocks to be viewed in RenderDoc)
+	GFX_THROW_INFO(pContext->QueryInterface(IID_PPV_ARGS(&pDebugAnnotation)));
 }
 
 void Graphics::StartFrame() noexcept

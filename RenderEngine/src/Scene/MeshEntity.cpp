@@ -23,13 +23,12 @@ MeshEntity::MeshEntity(Graphics &gfx, GeometryFactory::EType primitiveType)
 
 void MeshEntity::InitializeBindables(Graphics& gfx)
 {
-	VertexFactory meshDescriptor = m_Mesh->GetVertices();
-	auto idxData = m_Mesh->GetIndices();
+	const VertexFactory& meshDescriptor = m_Mesh->GetVertexFactory();
 	const auto geoTag = m_Mesh->GetPoolTag();
 
 	// Geo Buffers
 	AddBindable(VertexBuffer::Resolve(gfx, geoTag, meshDescriptor));
-	AddBindable(IndexBuffer::Resolve(gfx, geoTag, idxData));
+	AddBindable(IndexBuffer::Resolve(gfx, geoTag, meshDescriptor));
 
 	// Shaders
 	auto pVS = VertexShader::Resolve(gfx, "shaders/Shaders.hlsl");

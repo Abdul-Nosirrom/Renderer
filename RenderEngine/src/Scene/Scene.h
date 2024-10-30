@@ -10,7 +10,7 @@
 #include <assimp/scene.h>           // Output data structure
 #include <assimp/postprocess.h>     // Post processing flags
 
-#include "Math/Math.h"
+#include "MathCore.h"
 
 class EntityNode;
 class Graphics;

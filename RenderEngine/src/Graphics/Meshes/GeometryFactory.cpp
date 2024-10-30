@@ -1,15 +1,15 @@
 #include "GeometryFactory.h"
 #include <format>
-
+#include "Primitives/VertexFactory.h"
 #include "Graphics/Bindables/VertexBuffer.h"
 
 using namespace RenderResource;
 
-const char* GeometryFactory::MakeCube(VertexFactory& vertices, std::vector<unsigned short>& indices)
+std::string GeometryFactory::MakeCube(VertexFactory& vertexFactory)
 {
 	// Reset
-	vertices = VertexFactory();
-	indices.clear();
+	std::vector<Vertex> vertices;
+	std::vector<Face> indices;
 
 	// Split normals, so we dupli
 
@@ -23,19 +23,19 @@ const char* GeometryFactory::MakeCube(VertexFactory& vertices, std::vector<unsig
 
 			vert.SetPosition({ -1, -1, 1 }); // Bottom Left
 			vert.SetUV({ 0, 1 });
-			vertices.AddVertex(vert);
+			vertices.push_back(vert);
 
 			vert.SetPosition({ 1, -1, 1 }); // Bottom Right
 			vert.SetUV({ 1, 1 });
-			vertices.AddVertex(vert);
+			vertices.push_back(vert);
 
 			vert.SetPosition({ -1, 1, 1 }); // Top Left
 			vert.SetUV({ 0, 0 });
-			vertices.AddVertex(vert);
+			vertices.push_back(vert);
 
 			vert.SetPosition({ 1, 1, 1 }); // Top Right
 			vert.SetUV({ 1, 0 });
-			vertices.AddVertex(vert);
+			vertices.push_back(vert);
 		}
 
 		// Back Face
@@ -46,19 +46,19 @@ const char* GeometryFactory::MakeCube(VertexFactory& vertices, std::vector<unsig
 
 			vert.SetPosition({ 1, -1, -1 }); // Bottom Left
 			vert.SetUV({ 0, 1 });
-			vertices.AddVertex(vert);
+			vertices.push_back(vert);
 
 			vert.SetPosition({ -1, -1, -1 }); // Bottom Right
 			vert.SetUV({ 1, 1 });
-			vertices.AddVertex(vert);
+			vertices.push_back(vert);
 
 			vert.SetPosition({ 1, 1, -1 }); // Top Left
 			vert.SetUV({ 0, 0 });
-			vertices.AddVertex(vert);
+			vertices.push_back(vert);
 
 			vert.SetPosition({ -1, 1, -1 }); // Top Right
 			vert.SetUV({ 1, 0 });
-			vertices.AddVertex(vert);
+			vertices.push_back(vert);
 		}
 
 		// Right Face
@@ -69,19 +69,19 @@ const char* GeometryFactory::MakeCube(VertexFactory& vertices, std::vector<unsig
 
 			vert.SetPosition({ 1, -1, 1 }); // Bottom Left
 			vert.SetUV({ 0, 1 });
-			vertices.AddVertex(vert);
+			vertices.push_back(vert);
 
 			vert.SetPosition({ 1, -1, -1 }); // Bottom Right
 			vert.SetUV({ 1, 1 });
-			vertices.AddVertex(vert);
+			vertices.push_back(vert);
 
 			vert.SetPosition({ 1, 1, 1 }); // Top Left
 			vert.SetUV({ 0, 0 });
-			vertices.AddVertex(vert);
+			vertices.push_back(vert);
 
 			vert.SetPosition({ 1, 1, -1 }); // Top Right
 			vert.SetUV({ 1, 0 });
-			vertices.AddVertex(vert);
+			vertices.push_back(vert);
 		}
 
 		// Left Face
@@ -92,19 +92,19 @@ const char* GeometryFactory::MakeCube(VertexFactory& vertices, std::vector<unsig
 
 			vert.SetPosition({ -1, -1, -1 }); // Bottom Left
 			vert.SetUV({ 0, 1 });
-			vertices.AddVertex(vert);
+			vertices.push_back(vert);
 
 			vert.SetPosition({ -1, -1, 1 }); // Bottom Right
 			vert.SetUV({ 1, 1 });
-			vertices.AddVertex(vert);
+			vertices.push_back(vert);
 
 			vert.SetPosition({ -1, 1, -1 }); // Top Left
 			vert.SetUV({ 0, 0 });
-			vertices.AddVertex(vert);
+			vertices.push_back(vert);
 
 			vert.SetPosition({ -1, 1, 1 }); // Top Right
 			vert.SetUV({ 1, 0 });
-			vertices.AddVertex(vert);
+			vertices.push_back(vert);
 		}
 
 		// Top Face
@@ -115,19 +115,19 @@ const char* GeometryFactory::MakeCube(VertexFactory& vertices, std::vector<unsig
 
 			vert.SetPosition({ -1, 1, 1 }); // Bottom Left
 			vert.SetUV({ 0, 1 });
-			vertices.AddVertex(vert);
+			vertices.push_back(vert);
 
 			vert.SetPosition({ 1, 1, 1 }); // Bottom Right
 			vert.SetUV({ 1, 1 });
-			vertices.AddVertex(vert);
+			vertices.push_back(vert);
 
 			vert.SetPosition({ -1, 1, -1 }); // Top Left
 			vert.SetUV({ 0, 0 });
-			vertices.AddVertex(vert);
+			vertices.push_back(vert);
 
 			vert.SetPosition({ 1, 1, -1 }); // Top Right
 			vert.SetUV({ 1, 0 });
-			vertices.AddVertex(vert);
+			vertices.push_back(vert);
 		}
 
 		// Bottom Face
@@ -138,19 +138,19 @@ const char* GeometryFactory::MakeCube(VertexFactory& vertices, std::vector<unsig
 
 			vert.SetPosition({ -1, -1, -1 }); // Bottom Left
 			vert.SetUV({ 0, 1 });
-			vertices.AddVertex(vert);
+			vertices.push_back(vert);
 
 			vert.SetPosition({ 1, -1, -1 }); // Bottom Right
 			vert.SetUV({ 1, 1 });
-			vertices.AddVertex(vert);
+			vertices.push_back(vert);
 
 			vert.SetPosition({ -1, -1, 1 }); // Top Left
 			vert.SetUV({ 0, 0 });
-			vertices.AddVertex(vert);
+			vertices.push_back(vert);
 
 			vert.SetPosition({ 1, -1, 1 }); // Top Right
 			vert.SetUV({ 1, 0 });
-			vertices.AddVertex(vert);
+			vertices.push_back(vert);
 		}
 	}
 
@@ -159,24 +159,21 @@ const char* GeometryFactory::MakeCube(VertexFactory& vertices, std::vector<unsig
 		UINT faceOffset = faceIDX * 4;
 
 		// Tri 1
-		indices.push_back(faceOffset);
-		indices.push_back(faceOffset + 1);
-		indices.push_back(faceOffset + 2);
-
+		indices.push_back({{faceOffset, faceOffset + 1, faceOffset + 2}});
 		// Tri 2
-		indices.push_back(faceOffset + 1);
-		indices.push_back(faceOffset + 3);
-		indices.push_back(faceOffset + 2);
+		indices.push_back({{faceOffset + 1, faceOffset + 3, faceOffset + 2}});
 	}
+
+	vertexFactory.Init(vertices, indices);
 
 	return "$cube.";
 }
 
-const char* GeometryFactory::MakePlane(VertexFactory& vertices, std::vector<unsigned short>& indices, UINT tesseleation)
+std::string GeometryFactory::MakePlane(VertexFactory& vertexFactory, UINT tesseleation)
 {
 	// Reset
-	vertices = VertexFactory();
-	indices.clear();
+	std::vector<Vertex> vertices;
+	std::vector<Face> indices;
 
 	const auto v2i = [tesseleation](UINT x, UINT z)
 		{
@@ -197,7 +194,7 @@ const char* GeometryFactory::MakePlane(VertexFactory& vertices, std::vector<unsi
 			vert.SetPosition({ X, 0.f, Z });
 			vert.SetUV({ xPerc, zPerc });
 			vert.SetNormal({ 0, 1, 0 });
-			vertices.AddVertex(vert);
+			vertices.push_back(vert);
 
 			// 2D -> 1D map from Ix, Iz [row, column]
 			unsigned short idx = v2i(Ix, Iz);
@@ -209,26 +206,23 @@ const char* GeometryFactory::MakePlane(VertexFactory& vertices, std::vector<unsi
 			if (Ix != tesseleation-1 && Iz != tesseleation-1)
 			{
 				// tri 1
-				indices.push_back(idx);
-				indices.push_back(idxNeighbor);
-				indices.push_back(idxAboveNeighbor);
-
+				indices.push_back({{idx, idxNeighbor, idxAboveNeighbor}});
 				// tri 2
-				indices.push_back(idxAbove);
-				indices.push_back(idx);
-				indices.push_back(idxAboveNeighbor);
+				indices.push_back({{idxAbove, idx, idxAboveNeighbor}});
 			}
 		}
 	}
 
-	return std::format("$plane.{}", tesseleation).c_str();
+	vertexFactory.Init(vertices, indices);
+
+	return std::format("$plane.{}", tesseleation);
 }
 
-const char* GeometryFactory::MakeSphere(VertexFactory& vertices, std::vector<unsigned short>& indices, UINT phiSlices, UINT thetaSlices)
+std::string GeometryFactory::MakeSphere(VertexFactory& vertexFactory, UINT phiSlices, UINT thetaSlices)
 {
 	// Reset
-	vertices = VertexFactory();
-	indices.clear();
+	std::vector<Vertex> vertices;
+	std::vector<Face> indices;
 
 	for (UINT Iphi = 0; Iphi < phiSlices; Iphi++)
 	{
@@ -254,39 +248,43 @@ const char* GeometryFactory::MakeSphere(VertexFactory& vertices, std::vector<uns
 			vert.SetPosition({ X, Y, Z });
 			vert.SetNormal({ X, Y, Z });
 			vert.SetUV({ Itheta * 1.f / thetaSlices, Iphi * 1.f / phiSlices });
-			vertices.AddVertex(vert);
+			vertices.push_back(vert);
+
+			// define indices
+			UINT i1 = Iphi * thetaSlices + Itheta;
+			UINT i2 = (Iphi + 1) * thetaSlices + Itheta;
+			UINT i3 = Iphi * thetaSlices + (Itheta + 1);
+			UINT i4 = (Iphi+1) * thetaSlices + (Itheta+1);
 
 			// tri 1
-			indices.push_back(Iphi * thetaSlices + Itheta);
-			indices.push_back((Iphi+1) * thetaSlices + Itheta);
-			indices.push_back(Iphi * thetaSlices + (Itheta+1));
+			indices.push_back({{i1, i2, i3}});
 			// tri 2
-			indices.push_back(Iphi * thetaSlices + (Itheta+1));
-			indices.push_back((Iphi+1) * thetaSlices + Itheta);
-			indices.push_back((Iphi+1) * thetaSlices + (Itheta+1));
+			indices.push_back({{i3, i2, i4}});
 		}
 	}
 
-	return std::format("$sphere.{}.{}", phiSlices, thetaSlices).c_str();
+	vertexFactory.Init(vertices, indices);
+
+	return std::format("$sphere.{}.{}", phiSlices, thetaSlices);
 }
 
-const char* GeometryFactory::MakeCylinder(VertexFactory& vertices, std::vector<unsigned short>& indices, UINT radialSlices, float height)
+std::string GeometryFactory::MakeCylinder(VertexFactory& vertexFactory, UINT radialSlices, float height)
 {
 	// Reset
-	vertices = VertexFactory();
-	indices.clear();
+	std::vector<Vertex> vertices;
+	std::vector<Face> indices;
 
-	// Cap vertices
+	// Cap vertexFactory
 	Vertex capVert;
 	capVert.SetUV({ 0.5, 0.5 });
 	// Bottom Cap
 	capVert.SetPosition({ 0, -height/2.f, 0 });
 	capVert.SetNormal({ 0, -1, 0});
-	vertices.AddVertex(capVert);
+	vertices.push_back(capVert);
 	// Top Cap
 	capVert.SetPosition({ 0, height/2.f, 0 });
 	capVert.SetNormal({ 0, 1, 0 });
-	vertices.AddVertex(capVert);
+	vertices.push_back(capVert);
 	unsigned short idxOffset = 2;
 
 	// Base body
@@ -306,21 +304,17 @@ const char* GeometryFactory::MakeCylinder(VertexFactory& vertices, std::vector<u
 			vert.SetPosition({ X, Y, Z });
 			vert.SetNormal({ X, 0.f, Z });
 			vert.SetUV({ thetaPercent, float(Iheight) });
-			vertices.AddVertex(vert);
+			vertices.push_back(vert);
 
-			unsigned short radialIdx = Itheta + 2; // Accounting for offset from cap vertices
+			unsigned short radialIdx = Itheta + 2; // Accounting for offset from cap vertexFactory
 
 			// Radial Regular Verts
 			if (Iheight == 0)
 			{
 				// tri 1
-				indices.push_back(radialIdx);
-				indices.push_back(radialIdx + 1);
-				indices.push_back(radialIdx + radialSlices);
+				indices.push_back({{radialIdx, radialIdx + 1u, radialIdx + radialSlices}});
 				// tri 2
-				indices.push_back(radialIdx + 1);
-				indices.push_back(radialIdx + 1 + radialSlices);
-				indices.push_back(radialIdx + radialSlices);
+				indices.push_back({{radialIdx + 1u, radialIdx + 1 + radialSlices, radialIdx + radialSlices}});
 			}
 
 			idxOffset++;
@@ -344,9 +338,9 @@ const char* GeometryFactory::MakeCylinder(VertexFactory& vertices, std::vector<u
 			vert.SetPosition({ X, Y, Z });
 			vert.SetNormal({ 0, Iheight == 0 ? -1.f : 1.f, 0 });
 			vert.SetUV({ (X + 1.f)/2.f, (Z + 1.f)/2.f});
-			vertices.AddVertex(vert);
+			vertices.push_back(vert);
 
-			unsigned short radialOffset = radialSlices * Iheight + idxOffset; // Accounting for offset from cap vertices
+			unsigned short radialOffset = radialSlices * Iheight + idxOffset; // Accounting for offset from cap vertexFactory
 
 			unsigned short idx1 = radialOffset + Itheta ;
 			unsigned short idx2 = Iheight;
@@ -355,18 +349,16 @@ const char* GeometryFactory::MakeCylinder(VertexFactory& vertices, std::vector<u
 			// Different winding number so have to split
 			if (Iheight == 0) // Bottom
 			{
-				indices.push_back(idx1);
-				indices.push_back(idx2);
-				indices.push_back(idx3);
+				indices.push_back({{idx1, idx2, idx3}});
 			}
 			else // Top
 			{
-				indices.push_back(idx1);
-				indices.push_back(idx3);
-				indices.push_back(idx2);
+				indices.push_back({{idx1, idx3, idx2}});
 			}
 		}
 	}
 
-	return std::format("$plane.{}.{}", radialSlices, height).c_str();
+	vertexFactory.Init(vertices, indices);
+	
+	return std::format("$plane.{}.{}", radialSlices, height);
 }

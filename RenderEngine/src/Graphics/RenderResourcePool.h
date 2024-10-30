@@ -1,4 +1,5 @@
 #pragma once
+#include "Core.h"
 #include "Bindables/IBindable.h"
 #include <type_traits>
 #include <unordered_map>

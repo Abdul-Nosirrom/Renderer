@@ -4,6 +4,9 @@
 
 #include "Scene.h"
 
+#include <format>
+
+#include "d3d11_1.h"
 #include "Camera.h"
 #include "MeshEntity.h"
 
@@ -106,11 +109,18 @@ void Scene::Update(float DT)
 
 void Scene::Render(Graphics& gfx)
 {
+	gfx.StartEvent(L"Opaque Pass");
 	for (auto& node : m_entities)
 	{
 		if (node.get())
 		{
+			std::wostringstream eventTitle;
+			eventTitle << "Mesh Draw: " << node->GetName().c_str();
+
+			gfx.StartEvent(eventTitle.str());
 			node->OnRender(gfx); // Will then proceed to call draw on children
+			gfx.EndEvent();
 		}
 	}
+	gfx.EndEvent();
 }

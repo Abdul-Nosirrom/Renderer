@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Graphics/Bindables/VertexBuffer.h"
+#include "Primitives/VertexFactory.h"
 #include <vector>
 #include "GeometryFactory.h"
 
@@ -23,14 +24,14 @@ public:
 
 	Mesh& operator=(const Mesh&) = delete;
 
-	const RenderResource::VertexFactory& GetVertices() const { return m_Vertices; }
-	const std::vector<unsigned short>& GetIndices() const { return m_Indices; }
+	const VertexFactory& GetVertexFactory() const { return m_VertexFactory; }
+	const std::vector<Vertex>& GetVertices() const { return m_VertexFactory.m_Vertices; }
+	const std::vector<Face>& GetIndices() const { return m_VertexFactory.m_Faces; }
 
 	const std::string& GetPoolTag() const { return m_GeometryTag;  }
 
 protected:
-	RenderResource::VertexFactory m_Vertices;
-	std::vector<unsigned short> m_Indices;
+	VertexFactory m_VertexFactory;
 	std::string m_GeometryTag;
 	// Have a transform here for stuff like "radius" instead of baking it into the mesh?
 

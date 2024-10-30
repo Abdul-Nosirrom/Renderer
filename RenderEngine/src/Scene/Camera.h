@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Math/Math.h"
+#include "MathCore.h"
 #include <queue>
 
 #include "EntityNode.h"

@@ -19,6 +19,7 @@ public:
 
 	void OnRender(Graphics &gfx) const override;
 	const std::string& GetName() const override;
+	const std::unique_ptr<Mesh>& GetMesh() const { return m_Mesh; }
 
 protected:
 

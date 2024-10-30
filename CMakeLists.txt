@@ -35,6 +35,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
 #message("Eigen include dir = ${Eigen_INCLUDE_DIRS}")
 
 # Executable
+add_subdirectory(external)
+add_subdirectory(GeometryProcessing)
 add_subdirectory(RenderEngine)
 add_subdirectory(tests)
 #add_library(RenderEngine)

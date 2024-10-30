@@ -12,7 +12,7 @@ void EntityNode::AddChild(const std::shared_ptr<EntityNode>& child)
 
 const Matrix4x4& EntityNode::GetTransformMatrix() const noexcept
 {
-	if (m_Parent) return m_Parent->GetTransformMatrix() * m_Transform.GetMatrix();
+	if (m_Parent != nullptr) return m_Parent->GetTransformMatrix() * m_Transform.GetMatrix();
 	return m_Transform.GetMatrix();
 }
 

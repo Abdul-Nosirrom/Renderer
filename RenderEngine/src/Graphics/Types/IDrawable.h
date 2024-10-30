@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <memory>
 #include <vector>
-#include "Math.h"
+#include "MathCore.h"
 #include "Graphics/Graphics.h"
 
 // Forward declarations

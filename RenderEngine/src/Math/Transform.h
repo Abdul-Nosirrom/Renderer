@@ -2,15 +2,15 @@
 // Created by Abdulrahmen on 9/27/2024.
 //
 #pragma once
-#include "Math.h"
+#include "MathCore.h"
 
 
 class RENDERENGINE_API Transform
 {
 	friend class Editor_Scene;
 public:
-	Transform() : m_Position(Vector3(0,0,0)), m_Rotation(Vector3(0,0,0)), m_Scale(Vector3(1,1,1)) {}
-	Transform(const Vector3& inPos, const Vector3& inRot, const Vector3& inScale) : m_Position(inPos), m_Rotation(inRot), m_Scale(inScale) {}
+	Transform() : m_Position(Vector3(0,0,0)), m_Rotation(Vector3(0,0,0)), m_Scale(Vector3(1,1,1)) { m_Transform = Matrix4x4::Identity(); }
+	Transform(const Vector3& inPos, const Vector3& inRot, const Vector3& inScale) : m_Position(inPos), m_Rotation(inRot), m_Scale(inScale) { UpdateTransformMatrix(); }
 
 	inline void SetPosition(const Vector3& position) { m_Position = position; UpdateTransformMatrix(); }
 	inline void SetRotation(const Vector3& rotation) { m_Rotation = rotation; UpdateTransformMatrix(); }

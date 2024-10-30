@@ -1,5 +1,5 @@
 ﻿#include "Application.h"
-#include "Math/Math.h"
+#include "MathCore.h"
 #include <chrono>
 #include <random>
 #include "Scene/Camera.h"

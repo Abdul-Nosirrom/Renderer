@@ -1,65 +1,12 @@
 ﻿#pragma once
-#include "Math.h"
-
 #include "IBindable.h"
 #include <memory>
+
+struct VertexFactory;
 
 // TODO: Figure out VertexType
 namespace RenderResource
 {
-    struct Vertex
-    {
-	public:
-		Vertex() noexcept = default;
-
-		void SetPosition(Vector3 InPos) noexcept
-		{
-			Position = InPos;
-		}
-		void SetUV(Vector2 InUV) noexcept
-		{
-			UV = InUV;
-		}
-		void SetNormal(Vector3 InNormal) noexcept
-		{
-			Normal = InNormal;
-		}
-		void SetColor(Vector3 InColor) noexcept
-		{
-			Color = InColor;
-		}
-	protected:
-        Vector3 Position = { 0,0,0 };
-        Vector2 UV = { 0,0 };
-        Vector3 Normal = { 0,0,0 };
-        Vector3 Color = { 0,0,0 };
-    };
-
-    struct VertexFactory
-    {
-    public:
-        VertexFactory() noexcept = default;
-        
-        void AddVertex(const Vertex& InVertex) noexcept { m_VertexData.push_back(InVertex); }
-
-        void AddVertex(const Vector3& Pos) noexcept
-        { Vertex Vert; Vert.SetPosition(Pos); AddVertex(Vert); };
-        void AddVertex(const Vector3& Pos, const Vector2& UV) noexcept
-        { Vertex Vert; Vert.SetPosition(Pos); Vert.SetUV(UV), AddVertex(Vert); };
-        void AddVertex(const Vector3& Pos, const Vector3& Color) noexcept
-        { Vertex Vert; Vert.SetPosition(Pos); Vert.SetColor(Color), AddVertex(Vert); };
-        void AddVertex(const Vector3& Pos, const Vector3& Normal, const Vector2& UV) noexcept
-        { Vertex Vert; Vert.SetPosition(Pos); Vert.SetNormal(Normal); Vert.SetUV(UV); AddVertex(Vert); };
-        void AddVertex(const Vector3& Pos, const Vector3& Normal, const Vector2& UV, const Vector3& Color) noexcept
-        { Vertex Vert; Vert.SetPosition(Pos); Vert.SetNormal(Normal); Vert.SetUV(UV); Vert.SetColor(Color); AddVertex(Vert); };
-       
-        const void* Data() const { return m_VertexData.data(); }
-        size_t GetByteSize() const { return m_VertexData.size() * sizeof(Vertex); }
-
-    private:
-        std::vector<Vertex> m_VertexData;
-    };
-    
     class VertexBuffer : public IBindable
     {
     public:

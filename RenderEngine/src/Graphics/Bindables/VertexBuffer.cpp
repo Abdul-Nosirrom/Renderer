@@ -2,6 +2,7 @@
 
 #include "Errors/GraphicsExceptions.h"
 #include "Graphics/RenderResourcePool.h"
+#include "Primitives/VertexFactory.h"
 
 using namespace RenderResource;
 
@@ -19,7 +20,7 @@ VertexBuffer::VertexBuffer(Graphics& gfx, const std::string& poolTag, const Vert
     vbd.StructureByteStride = m_Stride;
 
     D3D11_SUBRESOURCE_DATA vbsd = {};
-    vbsd.pSysMem = vertexData.Data();
+    vbsd.pSysMem = vertexData.VertexData();
 
     GFX_THROW_INFO(GetDevice(gfx)->CreateBuffer(&vbd, &vbsd, &pVertexBuffer));
 }
