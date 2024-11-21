@@ -23,11 +23,11 @@ namespace RenderResource
         };
         
     public:
-        TransformCBuffer(Graphics& gfx, const IDrawable& Parent, UINT slot = 0u);
-        void Bind(Graphics& gfx) noexcept override;
+        TransformCBuffer(const IDrawable& Parent, UINT slot = 0u);
+        void Bind() noexcept override;
     protected:
-        void UpdateBind_Internal(Graphics& gfx, const Transforms& tf) noexcept;
-        Transforms GetTransforms(Graphics& gfx) noexcept;
+        void UpdateBind_Internal(const Transforms& tf) noexcept;
+        Transforms GetTransforms() noexcept;
 
     private:
         const IDrawable& m_Parent;

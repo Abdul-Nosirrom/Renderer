@@ -9,6 +9,7 @@
 #include "d3d11_1.h"
 #include "Camera.h"
 #include "MeshEntity.h"
+#include "Graphics/Renderer.h"
 
 Matrix4x4 ConvertAssimpMatrix(const aiMatrix4x4& m)
 {
@@ -37,7 +38,7 @@ float Scene::GetViewFoV() const
 	return m_activeCamera->GetFoV();
 }
 
-void Scene::LoadScene(Graphics& gfx, const std::string& filePath)
+void Scene::LoadScene(const std::string& filePath)
 {
 	Assimp::Importer modelLoader;
 	const aiScene* pScene = modelLoader.ReadFile(filePath.c_str(), aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_GenSmoothNormals);
@@ -50,13 +51,13 @@ void Scene::LoadScene(Graphics& gfx, const std::string& filePath)
 	auto pLocalRoot = pScene->mRootNode;
 
 	// root has no parents
-	RegisterNode(gfx, nullptr, pScene, pLocalRoot);
+	RegisterNode(nullptr, pScene, pLocalRoot);
 
 	// Add 'children' nodes
 	//for (unsigned int i = 0; i < pLocalRoot->)
 }
 
-void Scene::RegisterNode(Graphics& gfx, EntityNode* pParent, const aiScene* pScene, const aiNode* pNode)
+void Scene::RegisterNode(EntityNode* pParent, const aiScene* pScene, const aiNode* pNode)
 {
 	//if (pNode->mNumMeshes == 0) return;
 
@@ -67,7 +68,7 @@ void Scene::RegisterNode(Graphics& gfx, EntityNode* pParent, const aiScene* pSce
 	{
 		auto meshIdx = pNode->mMeshes[0];//i];
 		aiMesh* pMesh = pScene->mMeshes[meshIdx];
-		auto entity = std::make_shared<MeshEntity>(gfx, pMesh);
+		auto entity = std::make_shared<MeshEntity>(pMesh);
 		entity->m_Transform.SetMatrix(ConvertAssimpMatrix(pNode->mTransformation));
 		if (pParent)
 		{
@@ -85,7 +86,7 @@ void Scene::RegisterNode(Graphics& gfx, EntityNode* pParent, const aiScene* pSce
 	for (unsigned int i = 0; i < pNode->mNumChildren; i++)
 	{
 		aiNode* childNode = pNode->mChildren[i];
-		RegisterNode(gfx, pParent, pScene, childNode);
+		RegisterNode(pParent, pScene, childNode);
 	}
 
 }
@@ -107,9 +108,9 @@ void Scene::Update(float DT)
 	m_activeCamera->Update(DT);
 }
 
-void Scene::Render(Graphics& gfx)
+void Scene::Render()
 {
-	gfx.StartEvent(L"Opaque Pass");
+	RENDER_EVENT(Scene, L"Opaques")
 	for (auto& node : m_entities)
 	{
 		if (node.get())
@@ -117,10 +118,8 @@ void Scene::Render(Graphics& gfx)
 			std::wostringstream eventTitle;
 			eventTitle << "Mesh Draw: " << node->GetName().c_str();
 
-			gfx.StartEvent(eventTitle.str());
-			node->OnRender(gfx); // Will then proceed to call draw on children
-			gfx.EndEvent();
+			RENDER_EVENT(Object, L"MeshDraw");
+			node->OnRender(); // Will then proceed to call draw on children
 		}
 	}
-	gfx.EndEvent();
 }

@@ -13,7 +13,6 @@
 #include "MathCore.h"
 
 class EntityNode;
-class Graphics;
 class Camera;
 //class aiNode;
 //class aiScene;
@@ -25,7 +24,7 @@ class RENDERENGINE_API Scene
 public:
     static Scene& Get();
 
-    void LoadScene(Graphics& gfx, const std::string &filePath);
+    void LoadScene(const std::string &filePath);
 
     void AddEntity(std::shared_ptr<EntityNode> node)
     {
@@ -39,15 +38,16 @@ public:
     }
 
     void SetActiveCamera(std::shared_ptr<Camera> camera);
+    std::shared_ptr<Camera> GetActiveCamera() { return m_activeCamera; }
 
     void Update(float DT);
-    void Render(Graphics& gfx);
+    void Render();
 
     const Matrix4x4& GetViewMatrix() const;
     float GetViewFoV() const;
 
 private:
-    void RegisterNode(Graphics& gfx, EntityNode* pParent, const aiScene* pScene, const aiNode* pNode);
+    void RegisterNode(EntityNode* pParent, const aiScene* pScene, const aiNode* pNode);
 
     std::vector<std::shared_ptr<EntityNode>> m_entities;
     //std::vector<std::shared_ptr<Light>> m_lights;

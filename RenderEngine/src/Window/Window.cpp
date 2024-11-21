@@ -5,6 +5,7 @@
 #include "Editor/Editor.h"
 #include "Scene/Camera.h"
 #include "Errors/WindowExceptions.h"
+#include "Graphics/Renderer.h"
 #include "IO/InputHandler.h"
 
 /************************************************************************/
@@ -95,10 +96,10 @@ Window::Window(int width, int height, const char* name)
 	ShowWindow(m_hWnd, SW_SHOWDEFAULT);
 
 	// Initialize DX11
-	pGFX = std::make_unique<Graphics>(m_hWnd);
-	
+	Renderer::Init(m_hWnd);
+
 	// Initialize editor subsystem
-	Editor::Get().Initialize(m_hWnd, pGFX->pDevice.Get(), pGFX->pContext.Get());
+	Editor::Get().Initialize(m_hWnd);
 }
 
 Window::~Window()
@@ -205,12 +206,9 @@ LRESULT WINAPI Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		InputHandler::GetKeyboard().ClearState();
 		break;
 
-		// Resizing the window, invoke event on Graphics to adjust viewport
+	// Resizing the window, invoke event on Graphics to adjust viewport
 	case WM_SIZE:
-		if (pGFX)
-		{
-			pGFX->ResizeWindow({LOWORD(lParam), HIWORD(lParam)});
-		}
+		Renderer::ResizeWindow({LOWORD(lParam), HIWORD(lParam)});
 		break;
 		////////////////////////////////
 

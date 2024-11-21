@@ -7,32 +7,32 @@ using namespace RenderResource;
 
 std::unique_ptr<VertexConstantBuffer<TransformCBuffer::Transforms>> TransformCBuffer::pVCbuf; 
 
-TransformCBuffer::TransformCBuffer(Graphics& gfx, const IDrawable& Parent, UINT slot)
+TransformCBuffer::TransformCBuffer(const IDrawable& Parent, UINT slot)
     : m_Parent(Parent)
 {
     // Could've been initialized already
     if (!pVCbuf)
     {
-        pVCbuf = std::make_unique<VertexConstantBuffer<Transforms>>(gfx, slot);
+        pVCbuf = std::make_unique<VertexConstantBuffer<Transforms>>(slot);
     }
 }
 
-void TransformCBuffer::Bind(Graphics& gfx) noexcept
+void TransformCBuffer::Bind() noexcept
 {
-    UpdateBind_Internal(gfx, GetTransforms(gfx));
+    UpdateBind_Internal(GetTransforms());
 }
 
-void TransformCBuffer::UpdateBind_Internal(Graphics& gfx, const Transforms& tf) noexcept
+void TransformCBuffer::UpdateBind_Internal(const Transforms& tf) noexcept
 {
-    pVCbuf->Update(gfx, tf);
-    pVCbuf->Bind(gfx);
+    pVCbuf->Update(tf);
+    pVCbuf->Bind();
 }
 
-TransformCBuffer::Transforms TransformCBuffer::GetTransforms(Graphics& gfx) noexcept
+TransformCBuffer::Transforms TransformCBuffer::GetTransforms() noexcept
 {
     const auto M = m_Parent.GetTransformMatrix();
     const auto V = Scene::Get().GetViewMatrix();
-    const auto P = gfx.GetProjection();
+    const auto P = Renderer::GetProjectionMatrix();
 
     const auto modelViewProj = (P * V * M);
     const auto modelView = (V * M);

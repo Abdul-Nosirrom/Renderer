@@ -9,61 +9,59 @@
 
 using namespace RenderResource;
 
-MeshEntity::MeshEntity(Graphics& gfx, aiMesh* mesh)
+MeshEntity::MeshEntity(aiMesh* mesh)
 {
 	m_Mesh = std::make_unique<Mesh>(mesh);
-	InitializeBindables(gfx);
+	InitializeBindables();
 }
 
-MeshEntity::MeshEntity(Graphics &gfx, GeometryFactory::EType primitiveType)
+MeshEntity::MeshEntity(GeometryFactory::EType primitiveType)
 {
 	m_Mesh = std::make_unique<Mesh>(primitiveType);
-	InitializeBindables(gfx);
+	InitializeBindables();
 }
 
-void MeshEntity::InitializeBindables(Graphics& gfx)
+void MeshEntity::InitializeBindables()
 {
 	const VertexFactory& meshDescriptor = m_Mesh->GetVertexFactory();
 	const auto geoTag = m_Mesh->GetPoolTag();
 
 	// Geo Buffers
-	AddBindable(VertexBuffer::Resolve(gfx, geoTag, meshDescriptor));
-	AddBindable(IndexBuffer::Resolve(gfx, geoTag, meshDescriptor));
+	AddBindable(VertexBuffer::Resolve(geoTag, meshDescriptor));
+	AddBindable(IndexBuffer::Resolve(geoTag, meshDescriptor));
 
 	// Shaders
-	auto pVS = VertexShader::Resolve(gfx, "shaders/Shaders.hlsl");
-	auto pVSByteCode = pVS->GetBytecode(); // Retrieve to feed input input layout
-	AddBindable(std::move(pVS));
+	AddBindable(VertexShader::Resolve("shaders/Shaders.hlsl"));
 
-	AddBindable(PixelShader::Resolve(gfx, "shaders/Shaders.hlsl"));
+	AddBindable(PixelShader::Resolve("shaders/Shaders.hlsl"));
 
 	// Time constant buffer
 	//AddBindable(PixelConstantBuffer<TimeCBufData>::Resolve(gfx, 1));
 
 	// Bind Texture To Pixel Shader
-	AddBindable(Texture::Resolve(gfx, "resources/TextureTest.png", ETextureBindStage::Pixel, 0));
-	AddBindable(Sampler::Resolve(gfx, Sampler::Type::Anisotropic, ETextureBindStage::Pixel, 0));
-
-	AddBindable(Texture::Resolve(gfx, "resources/TextureTest.png", ETextureBindStage::Vertex, 0));
-	AddBindable(Sampler::Resolve(gfx, Sampler::Type::Anisotropic, ETextureBindStage::Vertex, 0));
+	// AddBindable(Texture::Resolve("resources/TextureTest.png", ETextureBindStage::Pixel, 0));
+	// AddBindable(Sampler::Resolve(Sampler::Type::Anisotropic, ETextureBindStage::Pixel, 0));
+	//
+	// AddBindable(Texture::Resolve("resources/TextureTest.png", ETextureBindStage::Vertex, 0));
+	// AddBindable(Sampler::Resolve(Sampler::Type::Anisotropic, ETextureBindStage::Vertex, 0));
 
 	// Shader Data
-	AddBindable(InputLayout::Resolve(gfx, pVSByteCode));
+	AddBindable(InputLayout::Resolve());
 
 	// Topology
-	AddBindable(Topology::Resolve(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
+	AddBindable(Topology::Resolve(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
 
 	// Constant Buffers
-	AddBindable(std::make_shared<TransformCBuffer>(gfx, *this));
+	AddBindable(std::make_shared<TransformCBuffer>(*this));
 }
 
-void MeshEntity::OnRender(Graphics &gfx) const
+void MeshEntity::OnRender() const
 {
-	Draw(gfx);
+	Draw();
 
 	for (const auto& childNode : m_childNodes)
 	{
-		childNode->OnRender(gfx);
+		childNode->OnRender();
 	}
 }
 

@@ -13,19 +13,19 @@ namespace RenderResource
     class ConstantBuffer : public IBindable
     {
     public:
-        void Update(Graphics& gfx, const T& cbufData)
+        void Update(const T& cbufData)
         {
-            INFOMAN(gfx);
+            INFOMAN();
 
             D3D11_MAPPED_SUBRESOURCE cbufMap;
-            GFX_THROW_INFO(GetContext(gfx)->Map(pConstantBuffer.Get(), 0u, D3D11_MAP_WRITE_DISCARD, 0u, &cbufMap));
+            GFX_THROW_INFO(GetContext()->Map(pConstantBuffer.Get(), 0u, D3D11_MAP_WRITE_DISCARD, 0u, &cbufMap));
             memcpy(cbufMap.pData, &cbufData, sizeof(cbufData));
-            GetContext(gfx)->Unmap(pConstantBuffer.Get(), 0u);
+            GetContext()->Unmap(pConstantBuffer.Get(), 0u);
         }
 
-        ConstantBuffer(Graphics& gfx, const T& cbufData, UINT slot = 0u) : m_Slot(slot)
+        ConstantBuffer(const T& cbufData, UINT slot = 0u) : m_Slot(slot)
         {
-            INFOMAN(gfx);
+            INFOMAN();
 
             D3D11_BUFFER_DESC cbufDesc;
             cbufDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
@@ -38,12 +38,12 @@ namespace RenderResource
             D3D11_SUBRESOURCE_DATA cbufSRD = {};
             cbufSRD.pSysMem = &cbufData;
 
-            GFX_THROW_INFO(GetDevice(gfx)->CreateBuffer(&cbufDesc, &cbufSRD, &pConstantBuffer));
+            GFX_THROW_INFO(GetDevice()->CreateBuffer(&cbufDesc, &cbufSRD, &pConstantBuffer));
         }
 
-        ConstantBuffer(Graphics& gfx, UINT slot = 0u) : m_Slot(slot)
+        ConstantBuffer(UINT slot = 0u) : m_Slot(slot)
         {
-            INFOMAN(gfx);
+            INFOMAN();
 
             D3D11_BUFFER_DESC cbufDesc;
             cbufDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
@@ -53,7 +53,7 @@ namespace RenderResource
             cbufDesc.ByteWidth = sizeof(T);
             cbufDesc.StructureByteStride = 0u;
 
-            GFX_THROW_INFO(GetDevice(gfx)->CreateBuffer(&cbufDesc, nullptr, &pConstantBuffer));
+            GFX_THROW_INFO(GetDevice()->CreateBuffer(&cbufDesc, nullptr, &pConstantBuffer));
         }
         
     protected:
@@ -74,14 +74,14 @@ namespace RenderResource
     public:
         using ConstantBuffer<T>::ConstantBuffer;
 
-        void Bind(Graphics& gfx) noexcept override
+        void Bind() noexcept override
         {
-            GetContext(gfx)->VSSetConstantBuffers(m_Slot, 1u, pConstantBuffer.GetAddressOf());
+            Renderer::GetContext()->VSSetConstantBuffers(m_Slot, 1u, pConstantBuffer.GetAddressOf());
         }
 
-        static std::shared_ptr<VertexConstantBuffer> Resolve(Graphics& gfx, UINT slot = 0)
+        static std::shared_ptr<VertexConstantBuffer> Resolve(UINT slot = 0)
         {
-            return Pool::Resolve<VertexConstantBuffer>(gfx, slot);
+            return BindablePool::Resolve<VertexConstantBuffer>(slot);
         }
         
         static std::string GenerateUID(UINT slot)
@@ -109,14 +109,14 @@ namespace RenderResource
     public:
         using ConstantBuffer<T>::ConstantBuffer;
 
-        void Bind(Graphics& gfx) noexcept override
+        void Bind() noexcept override
         {
-            GetContext(gfx)->PSSetConstantBuffers(m_Slot, 1u, pConstantBuffer.GetAddressOf());
+            Renderer::GetContext()->PSSetConstantBuffers(m_Slot, 1u, pConstantBuffer.GetAddressOf());
         }
 
-        static std::shared_ptr<PixelConstantBuffer> Resolve(Graphics& gfx, UINT slot = 0)
+        static std::shared_ptr<PixelConstantBuffer> Resolve(UINT slot = 0)
         {
-            return Pool::Resolve<PixelConstantBuffer>(gfx, slot);
+            return BindablePool::Resolve<PixelConstantBuffer>(slot);
         }
         
         static std::string GenerateUID(UINT slot)

@@ -21,9 +21,9 @@
 #endif
 
 #ifdef _DEBUG 
-	#define INFOMAN(gfx) DXGIInfoManager& m_InfoManager = GetInfoManager(gfx)
+	#define INFOMAN() DXGIInfoManager& m_InfoManager = GetInfoManager()
 #else 
-	#define INFOMAN(gfx)
+	#define INFOMAN()
 #endif 
 
 /// @brief  Exception class that handles HResults

@@ -12,13 +12,13 @@ namespace wrl = Microsoft::WRL;
 // IShader Interface
 //////////////////////////////////////////////////////////////////////////
 
-Shader::Shader(Graphics& gfx, const std::string& inPath) 
+Shader::Shader(const std::string& inPath)
 	: m_Path(inPath)
 {}
 
-void Shader::CompileShader(Graphics& gfx, const char* entryPoint, const char* profile)
+void Shader::CompileShader(const char* entryPoint, const char* profile)
 {
-	INFOMAN(gfx); 
+	INFOMAN();
 
 	wrl::ComPtr<ID3DBlob> pErrorBlob;
 	std::wstring shaderpath = std::wstring(m_Path.begin(), m_Path.end());
@@ -56,22 +56,22 @@ void Shader::CompileShader(Graphics& gfx, const char* entryPoint, const char* pr
 // Pixel Shader
 //////////////////////////////////////////////////////////////////////////
 
-PixelShader::PixelShader(Graphics& gfx, const std::string& inPath)
-	: Shader(gfx, inPath)
+PixelShader::PixelShader(const std::string& inPath)
+	: Shader(inPath)
 {
-	INFOMAN(gfx);
-	CompileShader(gfx, "PSMain", "ps_5_0");
-	GFX_THROW_INFO(GetDevice(gfx)->CreatePixelShader(pShaderBytecode->GetBufferPointer(), pShaderBytecode->GetBufferSize(), nullptr, &pPixelShader));
+	INFOMAN();
+	CompileShader("PSMain", "ps_5_0");
+	GFX_THROW_INFO(GetDevice()->CreatePixelShader(pShaderBytecode->GetBufferPointer(), pShaderBytecode->GetBufferSize(), nullptr, &pPixelShader));
 }
 
-void PixelShader::Bind(Graphics& gfx) noexcept
+void PixelShader::Bind() noexcept
 {
-	GetContext(gfx)->PSSetShader(pPixelShader.Get(), nullptr, 0u);
+	GetContext()->PSSetShader(pPixelShader.Get(), nullptr, 0u);
 }
 
-std::shared_ptr<PixelShader> PixelShader::Resolve(Graphics& gfx, const std::string& path)
+std::shared_ptr<PixelShader> PixelShader::Resolve(const std::string& path)
 {
-	return Pool::Resolve<PixelShader>(gfx, path);
+	return BindablePool::Resolve<PixelShader>(path);
 }
 
 std::string PixelShader::GenerateUID(const std::string& path)
@@ -89,22 +89,24 @@ std::string PixelShader::GetUID() const noexcept
 // Vertex Shader
 //////////////////////////////////////////////////////////////////////////
 
-VertexShader::VertexShader(Graphics& gfx, const std::string& inPath)
-	: Shader(gfx, inPath)
+VertexShader::VertexShader(const std::string& inPath)
+	: Shader(inPath)
 {
-	INFOMAN(gfx);
-	CompileShader(gfx, "VSMain", "vs_5_0");
-	GFX_THROW_INFO(GetDevice(gfx)->CreateVertexShader(pShaderBytecode->GetBufferPointer(), pShaderBytecode->GetBufferSize(), nullptr, &pVertexShader));
+	INFOMAN();
+	CompileShader("VSMain", "vs_5_0");
+	GFX_THROW_INFO(GetDevice()->CreateVertexShader(pShaderBytecode->GetBufferPointer(), pShaderBytecode->GetBufferSize(), nullptr, &pVertexShader));
 }
 
-void VertexShader::Bind(Graphics& gfx) noexcept
+void VertexShader::Bind() noexcept
 {
-	GetContext(gfx)->VSSetShader(pVertexShader.Get(), nullptr, 0u);
+	GetContext()->VSSetShader(pVertexShader.Get(), nullptr, 0u);
 }
 
-std::shared_ptr<VertexShader> VertexShader::Resolve(Graphics& gfx, const std::string& path)
+std::shared_ptr<VertexShader> VertexShader::Resolve(const std::string& path)
 {
-	return Pool::Resolve<VertexShader>(gfx, path);
+	auto pVS = BindablePool::Resolve<VertexShader>(path);
+	pLastResolvedByteCode = pVS->GetBytecode();
+	return pVS;
 }
 
 std::string VertexShader::GenerateUID(const std::string& path)
@@ -122,22 +124,22 @@ std::string VertexShader::GetUID() const noexcept
 // Geometry Shader
 //////////////////////////////////////////////////////////////////////////
 
-GeometryShader::GeometryShader(Graphics& gfx, const std::string& inPath)
-	: Shader(gfx, inPath)
+GeometryShader::GeometryShader(const std::string& inPath)
+	: Shader(inPath)
 {
-	INFOMAN(gfx);
-	CompileShader(gfx, "GSMain", "gs_5_0");
-	GFX_THROW_INFO(GetDevice(gfx)->CreateGeometryShader(pShaderBytecode->GetBufferPointer(), pShaderBytecode->GetBufferSize(), nullptr, &pGeometryShader));
+	INFOMAN();
+	CompileShader("GSMain", "gs_5_0");
+	GFX_THROW_INFO(GetDevice()->CreateGeometryShader(pShaderBytecode->GetBufferPointer(), pShaderBytecode->GetBufferSize(), nullptr, &pGeometryShader));
 }
 
-void GeometryShader::Bind(Graphics& gfx) noexcept
+void GeometryShader::Bind() noexcept
 {
-	GetContext(gfx)->GSSetShader(pGeometryShader.Get(), nullptr, 0u);
+	GetContext()->GSSetShader(pGeometryShader.Get(), nullptr, 0u);
 }
 
-std::shared_ptr<GeometryShader> GeometryShader::Resolve(Graphics& gfx, const std::string& path)
+std::shared_ptr<GeometryShader> GeometryShader::Resolve(const std::string& path)
 {
-	return Pool::Resolve<GeometryShader>(gfx, path);
+	return BindablePool::Resolve<GeometryShader>(path);
 }
 
 std::string GeometryShader::GenerateUID(const std::string& path)

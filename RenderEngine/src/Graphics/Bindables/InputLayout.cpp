@@ -1,33 +1,35 @@
 ﻿#include "InputLayout.h"
 
+#include "Shaders.h"
 #include "Primitives/Vertex.h"
 #include "Errors/GraphicsExceptions.h"
 #include "Graphics/RenderResourcePool.h"
 
 using namespace RenderResource;
 
-InputLayout::InputLayout(Graphics& gfx, ID3DBlob* pVertexShaderBytecode)
+InputLayout::InputLayout()
 {
-    INFOMAN(gfx);
-    GFX_THROW_INFO(GetDevice(gfx)->CreateInputLayout(
+    INFOMAN();
+
+    GFX_THROW_INFO(GetDevice()->CreateInputLayout(
         VertexAttributes::InputLayout,
         VertexAttributes::NumElements,
-        pVertexShaderBytecode->GetBufferPointer(),
-        pVertexShaderBytecode->GetBufferSize(),
+        VertexShader::GetLastByteCode()->GetBufferPointer(),
+        VertexShader::GetLastByteCode()->GetBufferSize(),
         &pInputLayout));
 }
 
-void InputLayout::Bind(Graphics& gfx) noexcept
+void InputLayout::Bind() noexcept
 {
-    GetContext(gfx)->IASetInputLayout(pInputLayout.Get());
+    GetContext()->IASetInputLayout(pInputLayout.Get());
 }
 
-std::shared_ptr<InputLayout> InputLayout::Resolve(Graphics& gfx, ID3DBlob* pVertexShaderBytecode)
+std::shared_ptr<InputLayout> InputLayout::Resolve()
 {
-    return Pool::Resolve<InputLayout>(gfx, pVertexShaderBytecode);
+    return BindablePool::Resolve<InputLayout>();
 }
 
-std::string InputLayout::GenerateUID(ID3DBlob* pVertexShaderBytecode)
+std::string InputLayout::GenerateUID()
 {
     //const std::vector<D3D11_INPUT_ELEMENT_DESC> elemDesc = { InputElem::POSITION, InputElem::UV, InputElem::NORMAL, InputElem::COLOR };
 

@@ -11,13 +11,13 @@ class RENDERENGINE_API MeshEntity : public EntityNode
 {
 public:
 	MeshEntity() = delete;
-	MeshEntity(Graphics& gfx, aiMesh* mesh);
-	MeshEntity(Graphics& gfx, GeometryFactory::EType primitiveType);
+	MeshEntity(aiMesh* mesh);
+	MeshEntity(GeometryFactory::EType primitiveType);
 	//~MeshEntity() { m_Mesh->rel; }
 
-	virtual void InitializeBindables(Graphics& gfx);
+	virtual void InitializeBindables();
 
-	void OnRender(Graphics &gfx) const override;
+	void OnRender() const override;
 	const std::string& GetName() const override;
 	const std::unique_ptr<Mesh>& GetMesh() const { return m_Mesh; }
 

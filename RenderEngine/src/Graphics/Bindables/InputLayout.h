@@ -56,11 +56,11 @@ namespace RenderResource
     class InputLayout : public IBindable
     {
     public:
-        InputLayout(Graphics& gfx, ID3DBlob* pVertexShaderBytecode);
-        void Bind(Graphics& gfx) noexcept override;
+        InputLayout();
+        void Bind() noexcept override;
 
-        static std::shared_ptr<InputLayout> Resolve(Graphics& gfx, ID3DBlob* pVertexShaderBytecode);
-        static std::string GenerateUID(ID3DBlob* pVertexShaderBytecode = nullptr);
+        static std::shared_ptr<InputLayout> Resolve();
+        static std::string GenerateUID();
 
         std::string GetUID() const noexcept override;
 

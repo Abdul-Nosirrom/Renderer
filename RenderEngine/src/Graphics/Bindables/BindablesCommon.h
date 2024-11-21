@@ -6,4 +6,7 @@
 #include "Shaders.h"
 #include "TransformCBuffer.h"
 #include "Topology.h"
-#include "Texture.h"
+#include "Sampler.h"
+
+#include "DepthStencilState.h"
+#include "BlendState.h"

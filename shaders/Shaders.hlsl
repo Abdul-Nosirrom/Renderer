@@ -39,13 +39,23 @@ Interpolator VSMain( float3 pos : POSITION, float2 UVs : TEXCOORD, float3 norm :
 }
 
 
-float4 PSMain(Interpolator interpolators) : SV_TARGET
+struct PSOutput
 {
-	return float4((interpolators.normal + 1)/2, 1.f);
+	float4 color : SV_TARGET0;
+	float4 worldPos : SV_TARGET1;
+	float4 worldNormal : SV_TARGET2;
+};
+
+PSOutput PSMain(Interpolator interpolators)
+{
 	//return testTexture.Sample(testTextureSampler, interpolators.uv);
 	//return float4(interpolators.uv, 0, 1);
-	const float3 Ambient = float3(0, 0, 0.3);
-	const float3 LightDir = normalize(float3(-1.f, 0.25f, -0.7f));
-	float3 LightAtten = (dot(LightDir, interpolators.normal) + 1.f)/2.f * float3(1.f, 1.f, 1.f);
-	return float4(normalize(LightAtten + Ambient) , 1.f);
+
+	PSOutput targets;
+
+	targets.color = float4(0.3,0,0.6,1);//float4(normalize(LightAtten + Ambient) , 1.f);
+	targets.worldNormal = float4((interpolators.normal + 1)/2, 1.f);
+	targets.worldPos = interpolators.worldPos;
+
+	return targets;
 }

@@ -5,14 +5,14 @@
 
 using namespace RenderResource;
 
-void IDrawable::Draw(Graphics& gfx) const
+void IDrawable::Draw() const
 {
     // Bind each bindable then call draw
     for (auto& bindable : m_Bindables)
     {
-        bindable->Bind(gfx);
+        bindable->Bind();
     }
-    gfx.DrawIndexed(pIndexBuffer->GetCount());
+    Renderer::Draw(pIndexBuffer->GetCount());
 }
 
 void IDrawable::AddBindable(std::shared_ptr<IBindable> bindable)

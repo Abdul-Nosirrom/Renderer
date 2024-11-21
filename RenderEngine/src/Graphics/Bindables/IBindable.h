@@ -1,5 +1,5 @@
 #pragma once
-#include "Graphics/Graphics.h"
+#include "Graphics/Renderer.h"
 #include <cassert>
 
 namespace RenderResource
@@ -8,7 +8,7 @@ namespace RenderResource
 	class IBindable
 	{
 	public:
-		virtual void Bind(Graphics& gfx) noexcept = 0;
+		virtual void Bind() noexcept = 0;
 		virtual std::string GetUID() const noexcept
 		{
 			assert(false);
@@ -17,12 +17,12 @@ namespace RenderResource
 		virtual ~IBindable() = default;
 
 	protected:
-		static ID3D11DeviceContext* GetContext(Graphics& gfx) noexcept { return gfx.pContext.Get();  }
-		static ID3D11Device* GetDevice(Graphics& gfx) noexcept { return gfx.pDevice.Get();  }
-		static DXGIInfoManager& GetInfoManager(Graphics& gfx)
+		static ID3D11DeviceContext* GetContext() noexcept { return Renderer::GetContext();  }
+		static ID3D11Device* GetDevice() noexcept { return Renderer::GetDevice();  }
+		static DXGIInfoManager& GetInfoManager()
 		{
 #ifdef _DEBUG 
-			return gfx.m_InfoManager;
+			return Renderer::m_InfoManager;
 #else 
 			throw std::logic_error("Error! Tried accessing Gfx.InfoManager in Release Config!");
 #endif 

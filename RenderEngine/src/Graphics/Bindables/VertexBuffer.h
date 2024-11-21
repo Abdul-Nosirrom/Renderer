@@ -10,11 +10,11 @@ namespace RenderResource
     class VertexBuffer : public IBindable
     {
     public:
-        VertexBuffer(Graphics& gfx, const std::string& poolTag, const VertexFactory& vertexData);
+        VertexBuffer(const std::string& poolTag, const VertexFactory& vertexData);
 
-        void Bind(Graphics& gfx) noexcept override;
+        void Bind() noexcept override;
 
-        static std::shared_ptr<VertexBuffer> Resolve(Graphics& gfx, const std::string& poolTag, const VertexFactory& vertexData);
+        static std::shared_ptr<VertexBuffer> Resolve(const std::string& poolTag, const VertexFactory& vertexData);
         // NOTE: this is needed so the signature matches with Resolve but we don't wanna pass the rest into it
         template<typename...Ignore>
         static std::string GenerateUID(const std::string& poolTag, Ignore&&...ignore)

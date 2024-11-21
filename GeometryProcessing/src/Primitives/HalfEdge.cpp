@@ -52,7 +52,11 @@ std::vector<HalfEdge*> HalfEdge::GenerateHalfEdges(std::vector<Vertex> &vertices
         {
             if (halfEdge == possibleTwin) continue;
 
-            const bool bIsTwin = halfEdge->vID == possibleTwin->next->vID && halfEdge->next->vID == possibleTwin->vID;
+            // Either same directionality or opposite directionality
+            // We encounter one issue that idk if its relevant to fix, but if we have split normals, then we're basically forced to duplicate vertices and consider them non-unique...
+            // By just comparing position vectors we avoid the issue of split-edges
+            const bool bIsTwin =   (halfEdge->vertex->Position == possibleTwin->next->vertex->Position && halfEdge->next->vertex->Position == possibleTwin->vertex->Position);
+            //                    || (halfEdge->vID == possibleTwin->vID && halfEdge->next->vID == possibleTwin->next->vID);
 
             if (bIsTwin)
             {

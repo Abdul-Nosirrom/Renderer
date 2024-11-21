@@ -28,7 +28,7 @@ public:
 
 protected:
 
-    void Initialize(HWND hwnd, ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+    void Initialize(HWND hwnd);
     void Shutdown();
 
     struct Menu
@@ -42,7 +42,7 @@ protected:
     Menu* m_MainMenu = nullptr;
 
     void OnRender(float dT);
-    void RenderMainMenu();
+    void RenderMainMenu(float dT);
     void RenderOptionMenu(Menu& menu);
     void RenderMenuItem(EditorWindow& window, const std::string& menuItemName);
     void RenderMenuItemHelp(EditorWindow& window);

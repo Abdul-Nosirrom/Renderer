@@ -6,10 +6,10 @@
 
 using namespace RenderResource;
 
-VertexBuffer::VertexBuffer(Graphics& gfx, const std::string& poolTag, const VertexFactory& vertexData)
+VertexBuffer::VertexBuffer(const std::string& poolTag, const VertexFactory& vertexData)
     : m_PoolTag(poolTag), m_Stride(sizeof(Vertex))
 {
-    INFOMAN(gfx);
+    INFOMAN();
 
     D3D11_BUFFER_DESC vbd;
     vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
@@ -22,19 +22,19 @@ VertexBuffer::VertexBuffer(Graphics& gfx, const std::string& poolTag, const Vert
     D3D11_SUBRESOURCE_DATA vbsd = {};
     vbsd.pSysMem = vertexData.VertexData();
 
-    GFX_THROW_INFO(GetDevice(gfx)->CreateBuffer(&vbd, &vbsd, &pVertexBuffer));
+    GFX_THROW_INFO(GetDevice()->CreateBuffer(&vbd, &vbsd, &pVertexBuffer));
 }
 
-void VertexBuffer::Bind(Graphics& gfx) noexcept
+void VertexBuffer::Bind() noexcept
 {
     const UINT offset = 0u;
-    GetContext(gfx)->IASetVertexBuffers(0u, 1u, pVertexBuffer.GetAddressOf(), &m_Stride, &offset);
+    GetContext()->IASetVertexBuffers(0u, 1u, pVertexBuffer.GetAddressOf(), &m_Stride, &offset);
 }
 
-std::shared_ptr<VertexBuffer> VertexBuffer::Resolve(Graphics& gfx, const std::string& poolTag,
+std::shared_ptr<VertexBuffer> VertexBuffer::Resolve(const std::string& poolTag,
     const VertexFactory& vertexData)
 {
-    return Pool::Resolve<VertexBuffer>(gfx, poolTag, vertexData);
+    return BindablePool::Resolve<VertexBuffer>(poolTag, vertexData);
 }
 
 std::string VertexBuffer::GenerateUID_Internal(const std::string& poolTag)

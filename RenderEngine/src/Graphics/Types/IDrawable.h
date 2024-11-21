@@ -2,7 +2,6 @@
 #include <memory>
 #include <vector>
 #include "MathCore.h"
-#include "Graphics/Graphics.h"
 
 // Forward declarations
 namespace RenderResource
@@ -20,9 +19,9 @@ public:
     IDrawable(const IDrawable&) = delete;
     virtual ~IDrawable() = default;
     
-    void Draw(Graphics& gfx) const;
+    void Draw() const;
 
-    virtual void Update(Graphics& gfx, float DeltaTime) {};
+    virtual void Update(float DeltaTime) {};
 
     virtual const Matrix4x4& GetTransformMatrix() const noexcept = 0;
 

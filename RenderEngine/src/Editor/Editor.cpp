@@ -10,6 +10,7 @@
 #include "imgui.h"
 #include "backends/imgui_impl_win32.h"
 #include "backends/imgui_impl_dx11.h"
+#include "Graphics/Renderer.h"
 #include "Windows/Editor_Scene.h"
 
 #define FONT_WIDTH ImGui::GetFontSize() * 0.5f
@@ -38,7 +39,7 @@ void Editor::CloseAllWindows()
     }
 }
 
-void Editor::Initialize(HWND hwnd, ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+void Editor::Initialize(HWND hwnd)
 {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -51,7 +52,7 @@ void Editor::Initialize(HWND hwnd, ID3D11Device* pDevice, ID3D11DeviceContext* p
     ImGui::StyleColorsDark();
 
     ImGui_ImplWin32_Init(hwnd);
-    ImGui_ImplDX11_Init(pDevice, pContext);
+    ImGui_ImplDX11_Init(Renderer::GetDevice(), Renderer::GetContext());
 
     // Add default windows
     m_MainMenu = new Menu();
@@ -133,7 +134,7 @@ void Editor::OnRender(float dT)
     ImGui::DockSpaceOverViewport(0, 0, ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoDockingOverCentralNode | ImGuiDockNodeFlags_AutoHideTabBar);
     ImGui::PopStyleColor(1);
 
-    RenderMainMenu();
+    RenderMainMenu(dT);
 
     for (auto& window : m_editorWindows)
     {
@@ -150,7 +151,7 @@ void Editor::OnRender(float dT)
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 }
 
-void Editor::RenderMainMenu()
+void Editor::RenderMainMenu(float dT)
 {
     if (ImGui::BeginMainMenuBar())
     {
@@ -165,6 +166,8 @@ void Editor::RenderMainMenu()
                 CloseAllWindows();
             ImGui::EndMenu();
         }
+
+        ImGui::Text("%.1f ms", dT * 1000.f);
 
         ImGui::EndMainMenuBar();
     }

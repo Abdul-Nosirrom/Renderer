@@ -5,11 +5,11 @@
 
 using namespace RenderResource;
 
-IndexBuffer::IndexBuffer(Graphics& gfx, const std::string& poolTag,
+IndexBuffer::IndexBuffer(const std::string& poolTag,
     const VertexFactory& indices)
         : m_PoolTag(poolTag), m_Count(indices.IndexCount())
 {
-    INFOMAN(gfx);
+    INFOMAN();
 
     D3D11_BUFFER_DESC ibd = {};
     ibd.Usage = D3D11_USAGE_DEFAULT;
@@ -22,18 +22,17 @@ IndexBuffer::IndexBuffer(Graphics& gfx, const std::string& poolTag,
     D3D11_SUBRESOURCE_DATA ibsd = {};
     ibsd.pSysMem = indices.IndexData();
 
-    GFX_THROW_INFO(GetDevice(gfx)->CreateBuffer(&ibd, &ibsd, &pIndexBuffer));
+    GFX_THROW_INFO(GetDevice()->CreateBuffer(&ibd, &ibsd, &pIndexBuffer));
 }
 
-void IndexBuffer::Bind(Graphics& gfx) noexcept
+void IndexBuffer::Bind() noexcept
 {
-    GetContext(gfx)->IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0u);
+    GetContext()->IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0u);
 }
 
-std::shared_ptr<IndexBuffer> IndexBuffer::Resolve(Graphics& gfx,
-    const std::string& poolTag, const VertexFactory& indices)
+std::shared_ptr<IndexBuffer> IndexBuffer::Resolve(const std::string& poolTag, const VertexFactory& indices)
 {
-    return Pool::Resolve<IndexBuffer>(gfx, poolTag, indices);
+    return BindablePool::Resolve<IndexBuffer>(poolTag, indices);
 }
 
 std::string IndexBuffer::GenerateUID_Internal(const std::string& poolTag)

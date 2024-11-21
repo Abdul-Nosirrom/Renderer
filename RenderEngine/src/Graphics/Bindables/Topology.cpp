@@ -4,19 +4,18 @@
 
 using namespace RenderResource;
 
-Topology::Topology(Graphics& gfx, D3D11_PRIMITIVE_TOPOLOGY type)
+Topology::Topology(D3D11_PRIMITIVE_TOPOLOGY type)
     : m_Type(type)
 {}
 
-void Topology::Bind(Graphics& gfx) noexcept
+void Topology::Bind() noexcept
 {
-    GetContext(gfx)->IASetPrimitiveTopology(m_Type);
+    GetContext()->IASetPrimitiveTopology(m_Type);
 }
 
-std::shared_ptr<Topology> Topology::Resolve(Graphics& gfx,
-    D3D11_PRIMITIVE_TOPOLOGY type)
+std::shared_ptr<Topology> Topology::Resolve(D3D11_PRIMITIVE_TOPOLOGY type)
 {
-    return Pool::Resolve<Topology>(gfx, type);
+    return BindablePool::Resolve<Topology>(type);
 }
 
 std::string Topology::GenerateUID(D3D11_PRIMITIVE_TOPOLOGY type)

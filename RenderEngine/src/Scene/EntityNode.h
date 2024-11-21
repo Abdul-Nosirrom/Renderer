@@ -15,7 +15,7 @@ class RENDERENGINE_API EntityNode : public IDrawable
 
 public:
 	void AddChild(const std::shared_ptr<EntityNode> &child);
-	virtual void OnRender(Graphics& gfx) const {}
+	virtual void OnRender() const {}
 
 	const Matrix4x4& GetTransformMatrix() const noexcept override;
 	Transform& GetTransform() noexcept { return m_Transform; }

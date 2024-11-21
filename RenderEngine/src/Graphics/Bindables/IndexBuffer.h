@@ -10,12 +10,12 @@ namespace RenderResource
     class IndexBuffer : public IBindable
     {
     public:
-        IndexBuffer(Graphics& gfx, const std::string& poolTag, const VertexFactory& indices);
+        IndexBuffer(const std::string& poolTag, const VertexFactory& indices);
 
         UINT GetCount() const noexcept { return m_Count; }
-        void Bind(Graphics& gfx) noexcept override;
+        void Bind() noexcept override;
 
-        static std::shared_ptr<IndexBuffer> Resolve(Graphics& gfx, const std::string& poolTag, const VertexFactory& indices);
+        static std::shared_ptr<IndexBuffer> Resolve(const std::string& poolTag, const VertexFactory& indices);
 
         // NOTE: this is needed so the signature matches with Resolve but we don't wanna pass the rest into it
         template<typename...Ignore>

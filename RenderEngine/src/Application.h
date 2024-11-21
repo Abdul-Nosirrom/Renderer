@@ -14,6 +14,8 @@ namespace RenderEngine
 
     protected:
         void RunFrame();
+        void Init();
+        virtual void SetupRenderGraph();
 
         Window m_Window;
         OdaTimer m_Timer;
